@@ -1,51 +1,98 @@
-#
-# This is a Shiny web application. You can run the application by clicking
-# the 'Run App' button above.
-#
-# Find out more about building applications with Shiny here:
-#
-#    http://shiny.rstudio.com/
-#
+# Shiny Dashboard
 
+## app.R ##
 library(shiny)
+library(shinydashboard)
+library(ggplot2)
 
-# Define UI for application that draws a histogram
-ui <- fluidPage(
+# Load Data
+raw_lead <-  read.csv("https://raw.githubusercontent.com/quinCHB/Dashboard-1/main/lead.csv")
 
-    # Application title
-    titlePanel("Old Faithful Geyser Data"),
-
-    # Sidebar with a slider input for number of bins 
-    sidebarLayout(
-        sidebarPanel(
-            sliderInput("bins",
-                        "Number of bins:",
-                        min = 1,
-                        max = 50,
-                        value = 30)
-        ),
-
-        # Show a plot of the generated distribution
-        mainPanel(
-           plotOutput("distPlot")
-        )
+ui <- dashboardPage(
+  
+  dashboardHeader(title = "MN Public Health Data Access Portal"),
+  
+  dashboardSidebar(
+    
+    selectInput("par_county",
+                label= "Select County of Interest",
+                choices= sort(unique(raw_lead$location)),
+                selected= "Kittson",
+                multiple= FALSE
+                )
+    
+    ),
+  dashboardBody(
+    fluidRow(box(plotOutput("lead_state")),
+             box()),
+    fluidRow(box(plotOutput("lead_county")),
+             box()),
+    fluidRow(box(plotOutput("lead_state")),
+             box()),
     )
 )
 
-# Define server logic required to draw a histogram
-server <- function(input, output) {
-
-    output$distPlot <- renderPlot({
-        # generate bins based on input$bins from ui.R
-        x    <- faithful[, 2]
-        bins <- seq(min(x), max(x), length.out = input$bins + 1)
-
-        # draw the histogram with the specified number of bins
-        hist(x, breaks = bins, col = 'darkgray', border = 'white',
-             xlab = 'Waiting time to next eruption (in mins)',
-             main = 'Histogram of waiting times')
-    })
+server <- function(input, output) { 
+  
+  #State Plot Total
+  output$lead_state <-  renderPlot({
+   
+     raw_lead[raw_lead$location =="Minnesota" & 
+              raw_lead$indicator== "Test year (annual method)"&
+              raw_lead$Indicator == "Blood lead testing"
+              #Requires a comma to work
+              ,] |>
+      ggplot(aes(x= year, y= pctTested/100, color= ageGroup)) +
+      geom_line()+
+      geom_point()+
+      
+      scale_x_discrete(limits = raw_lead$year)+
+      labs(
+        title = "Lead Testing",
+        x = NULL,
+        y = "Pct Tested",
+        caption = "Data last updated, 1/15/2024")
+  })
+  
+  
+  output$lead_county <-  renderPlot({
+    
+    raw_lead[raw_lead$location =="Minnesota" & 
+               raw_lead$indicator== "Test year (annual method)"&
+               raw_lead$Indicator == "Blood lead testing"
+             #Requires a comma to work
+             ,] |>
+      ggplot(aes(x= year, y= pctTested/100, color= ageGroup)) +
+      geom_line()+
+      geom_point()+
+      
+      scale_x_discrete(limits = raw_lead$year)+
+      labs(
+        title = "Lead Testing",
+        x = NULL,
+        y = "Pct Tested",
+        caption = "Data last updated, 1/15/2024")
+  })
+  
+  
+  
+  # Get county data subset
+  county_sub <- reactive({lead_county[lead_county == input$par_county,] })
+  
+  output$lead_county <-  renderPlot({
+    #Open parenthesis since it is dynamic
+    county_sub() |>
+      ggplot(aes(x= year, y= pctTested/100, color= ageGroup)) +
+      geom_line()+
+      geom_point()+
+      
+      scale_x_discrete(limits = raw_lead$year)+
+      labs(
+        title = "Lead Testing",
+        x = NULL,
+        y = "Pct Tested",
+        caption = "Data last updated, 1/15/2024")
+  })
 }
 
-# Run the application 
-shinyApp(ui = ui, server = server)
+shinyApp(ui=ui, server=server)
