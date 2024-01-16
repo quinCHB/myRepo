@@ -27,7 +27,7 @@ ui <- dashboardPage(
              box()),
     fluidRow(box(plotOutput("lead_county")),
              box()),
-    fluidRow(box(plotOutput("lead_state")),
+    fluidRow(box(),
              box()),
     )
 )
@@ -55,7 +55,7 @@ server <- function(input, output) {
   })
   
   
-  output$lead_county <-  renderPlot({
+  output$lead_chb <-  renderPlot({
     
     raw_lead[raw_lead$location =="Minnesota" & 
                raw_lead$indicator== "Test year (annual method)"&
@@ -77,7 +77,7 @@ server <- function(input, output) {
   
   
   # Get county data subset
-  county_sub <- reactive({lead_county[lead_county == input$par_county,] })
+  county_sub <- reactive({raw_lead[raw_lead$location == input$par_county,] })
   
   output$lead_county <-  renderPlot({
     #Open parenthesis since it is dynamic
