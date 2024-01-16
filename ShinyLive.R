@@ -12,10 +12,11 @@ pak::pak("rstudio/httpuv")
 # packageVersion("shinylive")
 # packageVersion("httpuv")
 
-shinylive::export(app_dir = "Default Application", output_dir = "docs")
+shinylive::export(appdir = "Default Application", destdir = "docs")
 
 
 # Thank you Ellis Hughes and Patrick Ward for your tutorial
 # https://www.youtube.com/watch?v=B3Nggr9X4rY&t=239s
 
+#See deployed application locally
 httpuv::runStaticServer( dir="docs", port= 8888)
