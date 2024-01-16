@@ -17,3 +17,5 @@ shinylive::export(app_dir = "Default Application", output_dir = "docs")
 
 # Thank you Ellis Hughes and Patrick Ward for your tutorial
 # https://www.youtube.com/watch?v=B3Nggr9X4rY&t=239s
+
+httpuv::runStaticServer( dir="docs", port= 8888)
