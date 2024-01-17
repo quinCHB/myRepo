@@ -4,32 +4,48 @@
 library(shiny)
 library(shinydashboard)
 library(ggplot2)
+library(plotly)
 
 # Load Data
-raw_lead <-  read.csv("https://raw.githubusercontent.com/quinCHB/Dashboard-1/main/lead.csv")
+raw_lead <-  read.csv("https://raw.githubusercontent.com/quinCHB/Public-Datasources/main/lead.csv")
+
 
 ui <- dashboardPage(
-  
+
   dashboardHeader(title = "MN Public Health Data Access Portal"),
-  
+
   dashboardSidebar(
-    
+
+    selectInput("par_region",
+                label= "In Development",
+                choices= "In Development", #sort(unique(raw_lead$location)),
+                selected= NULL,
+                multiple= FALSE
+    ),
+
+    selectInput("par_chb",
+                label= "In Development",
+                choices= "In Development", #sort(unique(raw_lead$location)),
+                selected= NULL,
+                multiple= FALSE
+    ),
+
     selectInput("par_county",
                 label= "Select County of Interest",
                 choices= sort(unique(raw_lead$location)),
                 selected= "Kittson",
                 multiple= FALSE
                 )
-    
+
     ),
   dashboardBody(
     fluidRow(box(plotOutput("lead_state")),
-             box()),
-    fluidRow(box(plotOutput("lead_county")),
-             box()),
-    fluidRow(box(),
-             box()),
-    )
+             box()
+             ),
+    fluidRow(box(), 
+             box(plotOutput("lead_county"))
+             )
+  )
 )
 
 server <- function(input, output) { 
@@ -45,8 +61,8 @@ server <- function(input, output) {
       ggplot(aes(x= year, y= pctTested/100, color= ageGroup)) +
       geom_line()+
       geom_point()+
-      
-      scale_x_discrete(limits = raw_lead$year)+
+      guides(color = guide_legend(title = "Age Group"))+
+      scale_x_discrete(limits = raw_lead$year, guide = guide_axis(n.dodge = 2))+
       labs(
         title = "Lead Testing",
         x = NULL,
@@ -85,8 +101,8 @@ server <- function(input, output) {
       ggplot(aes(x= year, y= pctTested/100, color= ageGroup)) +
       geom_line()+
       geom_point()+
-      
-      scale_x_discrete(limits = raw_lead$year)+
+      guides(color = guide_legend(title = "Age Group"))+
+      scale_x_discrete(limits = raw_lead$year, guide = guide_axis(n.dodge = 2))+
       labs(
         title = "Lead Testing",
         x = NULL,
