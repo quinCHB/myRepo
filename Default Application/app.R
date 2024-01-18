@@ -59,7 +59,11 @@ ui <- dashboardPage(
              ),
     fluidRow(box(plotOutput("lead_chb")), 
              box(plotOutput("lead_county"))
-             )
+             ),
+    
+    fluidRow(box(), 
+             box()
+    )
   )
 )
 
@@ -262,5 +266,7 @@ server <- function(input, output) {
         caption = "Data last updated, 1/15/2024")
   })
 }
+
+#testing
 
 shinyApp(ui=ui, server=server)
