@@ -4,7 +4,6 @@
 library(shiny)
 library(shinydashboard)
 library(ggplot2)
-# dplr
 
 # Load Data
   
@@ -22,35 +21,6 @@ library(ggplot2)
 lead_raw <-  read.csv(
   "https://raw.githubusercontent.com/quinCHB/Public-Datasources/main/MN%20Public%20Health%20Data%20Access%20Portal/Healthy%20Homes/Childhood%20Lead%20Exposure.csv"
 )
-
-# # Split the data frame by the group column
-# schsac_split <- split("region_narrative" , "region_narrative$Region")
-# 
-# # Apply a function to each subset to create a new column with comma-separated values
-# schsac_character <- sapply(schsac_split, function(x) paste(x$County, collapse = ", "))
-# 
-# # Convert the result to a data frame
-# schsac_df <- as.data.frame(schsac_character)
-# 
-# # Create an empty character vector to store the results
-# schsac_character_placeholder <- character()
-# 
-# # Loop through each row of schsac_df
-# for (i in 1:nrow(schsac_df)) {
-#   # Get the row name and schsac_character_placeholder as strings
-#   rowname <- as.character(rownames(schsac_df)[i])
-#   schsac_character_placeholder <- as.character(schsac_df$schsac_character[i])
-#   
-#   # Concatenate them with a separator
-#   concat <- paste0(rowname, ":: ", schsac_character_placeholder)
-#   
-#   # Append the result to the vector
-#   schsac_character_placeholder <- c(schsac_character_placeholder, concat)
-# }
-# 
-# # Paste the result vector with semicolons and new lines
-# test <- HTML(paste(schsac_character_placeholder, collapse=  "<br/>"))
-
 
 ui <- dashboardPage(
                     dashboardHeader(title = "MN Public Health Data Access Portal", titleWidth = 400),
