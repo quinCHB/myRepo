@@ -11,16 +11,16 @@ library(shinyjs)
 # Input parameters
   # State Community Health Services Advisory Committee as of 1_17_2024
   input_schsac_raw <- read.csv(
-    "https://raw.githubusercontent.com/quinCHB/Public-Datasources/main/MN%20SCHSAC%20%26%20CHB%20Regions/State%20Community%20Health%20Services%20Advisory%20Committee%20as%20of%201_17_2024.csv"
+    "https://raw.githubusercontent.com/quinCHB/Public-Data-Sources/main/MN%20SCHSAC%20%26%20CHB%20Regions/State%20Community%20Health%20Services%20Advisory%20Committee%20as%20of%201_17_2024.csv"
   )
   
   input_chb_raw <- read.csv(
-    "https://raw.githubusercontent.com/quinCHB/Public-Datasources/main/MN%20SCHSAC%20%26%20CHB%20Regions/MN%20CHB%20as%20of%201_17_2024.csv"
+    "https://raw.githubusercontent.com/quinCHB/Public-Data-Sources/main/MN%20SCHSAC%20%26%20CHB%20Regions/MN%20CHB%20as%20of%201_17_2024.csv"
   )
 
 #Healthy Homes
 lead_raw <-  read.csv(
-  "https://raw.githubusercontent.com/quinCHB/Public-Datasources/main/MN%20Public%20Health%20Data%20Access%20Portal/Healthy%20Homes/Childhood%20Lead%20Exposure.csv"
+  "https://raw.githubusercontent.com/quinCHB/Public-Data-Sources/main/MN%20Public%20Health%20Data%20Access%20Portal/Healthy%20Homes/Childhood%20Lead%20Exposure.csv"
 )
 
 ui <- dashboardPage(
