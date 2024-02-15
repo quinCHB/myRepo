@@ -20,3 +20,4 @@ shinylive::export(appdir = "Default Application", destdir = "docs")
 
 #See deployed application locally
 httpuv::runStaticServer( dir="docs", port= 8888)
+
