@@ -273,7 +273,7 @@ schsac_raw$Region <-  paste("<b>", schsac_raw$Region, "</b>")
 #############
 ## CHB Narrative 01 (It is split in half so it displays in two nice columns on the UI
 # Create chb data frame for global narrative reference
-chb_raw_01 <- input_chb_raw[1:44,]
+chb_raw_01 <- input_chb_raw[1:33,]
 
 #Bold CHBs so it is easier to understand narrative
 chb_raw_01$CHB <-  paste("<b>", chb_raw_01$CHB, "</b>")
@@ -282,7 +282,7 @@ chb_raw_01$CHB <-  paste("<b>", chb_raw_01$CHB, "</b>")
 #############
 ## CHB Narrative 02 (It is split in half so it displays in two nice columns on the UI
 # Create chb data frame for global narrative reference
-chb_raw_02 <- input_chb_raw[45:nrow(input_chb_raw),] # :nrow means it goes to the end of the data frame
+chb_raw_02 <- input_chb_raw[34:nrow(input_chb_raw),] # :nrow means it goes to the end of the data frame
 
 #Bold CHBs so it is easier to understand narrative
 chb_raw_02$CHB <-  paste("<b>", chb_raw_02$CHB, "</b>")
@@ -300,7 +300,7 @@ lead_CHB <- merge(x= lead_raw, y= input_chb_raw, by.x= "location", by.y= "County
 # Next sum denominator
 #Combine in a completed data set
 
-#Sum will be applied to numTested and it will (~) be subsetted by everything after
+#Sum will be applied to numTested and it will (~) be subset by everything after
 lead_CHBGrpTested <-  aggregate(numTested~
                                   ageGroup+
                                   CHB+
@@ -717,8 +717,8 @@ server <- function(input, output, session) {
         labs(
             title = paste("Blood Lead Testing (Test Year) for \n", input$par_chb, "CHB"), #\n means a new line
             x = NULL,
-            y = "Pct Tested"
-           # caption = "Data last updated, 1/15/2024"
+            y = "Pct Tested",
+            caption = "Data last updated, 1/15/2024"
            )
     })
     
