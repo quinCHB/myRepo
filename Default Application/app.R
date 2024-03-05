@@ -1,6 +1,10 @@
 # Shiny Dashboard
+# Hastag (# ---------------------------------------------------------------) means Primary Header
+# Hastag (### *** Definition ###) means Secondary Header
+# Hold shift alt o to collapse all
+# Hold alt o to expand all
 
-# Load Packages Start ---------------------------------------------------------------
+# Load Packages ---------------------------------------------------------------
 library(shiny)
 library(shinydashboard)
 library(ggplot2)
@@ -8,23 +12,18 @@ library(ggplot2)
 #when deployed comment out the shinyjs library since shinylive loads it 
 #library(shinyjs)
 
-# Load Data Start ---------------------------------------------------------------
+# Load Data ---------------------------------------------------------------
 
 # Input parameters
   # State Community Health Services Advisory Committee as of 1_17_2024
-  input_schsac_raw <- read.csv(
-    "https://raw.githubusercontent.com/quinCHB/Public-Data-Sources/main/MN%20SCHSAC%20%26%20CHB%20Regions/State%20Community%20Health%20Services%20Advisory%20Committee%20as%20of%201_17_2024.csv"
-  )
-  input_chb_raw <- read.csv(
-    "https://raw.githubusercontent.com/quinCHB/Public-Data-Sources/main/MN%20SCHSAC%20%26%20CHB%20Regions/MN%20CHB%20as%20of%201_17_2024.csv"
-  )
+  input_schsac_raw <- read.csv("https://raw.githubusercontent.com/quinCHB/Public-Data-Sources/main/MN%20SCHSAC%20%26%20CHB%20Regions/State%20Community%20Health%20Services%20Advisory%20Committee%20as%20of%201_17_2024.csv")
+  # Community Health Board as of 1_17_2024
+  input_chb_raw <- read.csv("https://raw.githubusercontent.com/quinCHB/Public-Data-Sources/main/MN%20SCHSAC%20%26%20CHB%20Regions/Community%20Health%20Board%20as%20of%201_17_2024.csv")
 
-#Healthy Homes
+### *** Healthy Homes ***
   
 #Lead
-lead_raw <-  read.csv(
-  "https://raw.githubusercontent.com/quinCHB/Public-Data-Sources/main/MN%20Public%20Health%20Data%20Access%20Portal/Healthy%20Homes/Childhood%20Lead%20Exposure.csv"
-)
+lead_raw <-  read.csv("https://raw.githubusercontent.com/quinCHB/Public-Data-Sources/main/MN%20Public%20Health%20Data%20Access%20Portal/Healthy%20Homes/Childhood%20Lead%20Exposure.csv")
 #Radon
 
 # User Interface ----------------------------------------------------------
@@ -77,7 +76,7 @@ ui <- dashboardPage(
                                               )
                                     ),
                       dashboardBody(
-                        useShinyjs(),
+                       # useShinyjs(), #uncomment this when running application locally but when shinylive application is deployed comment it out since shinylive shinyjs is applied to shinyLive applications 
                                     fluidRow(
                                             column(12,
                                                    tabItems(
