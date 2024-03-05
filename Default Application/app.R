@@ -4,7 +4,7 @@
 library(shiny)
 library(shinydashboard)
 library(ggplot2)
-library(shinyjs)
+#library(shinyjs)
 
 # Load Data
   
@@ -678,12 +678,23 @@ server <- function(input, output, session) {
     
     #Reactive Data
     validateChb <- reactive({
-                validate(
-                        need(
-                            input$par_chb == lead_CHBComplete$CHB, paste("There is no data for ", input$par_chb)
-                            )
-                        )
+                            validate(
+                                    need(
+                                        input$par_chb == lead_CHBComplete$CHB, paste("There is no data for ", input$par_chb)
+                                        )
+                                    )
     })
+    
+    #Reactive Data
+    # validateChb <- reactive({
+    #                         if(input$par_chb == lead_CHBComplete$CHB
+    #                            ) 
+    #                             {
+    #                             validate(
+    #                                     paste("There is no data for ", input$par_chb)
+    #                                     )
+    #                             }
+    #                       })
     
     #Reactive Data
     lead_CHB_sub <- reactive({
