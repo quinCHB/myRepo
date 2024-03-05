@@ -4,6 +4,8 @@
 library(shiny)
 library(shinydashboard)
 library(ggplot2)
+#Uncomment the shinyjs library when testing application so appliaction can be run locally 
+#when deployed comment out the shinyjs library since shinylive loads it 
 #library(shinyjs)
 
 # Load Data
@@ -706,32 +708,31 @@ server <- function(input, output, session) {
   
   
     output$lead_chb <-  renderPlot({
-      
-      validateChb() #Won't return red error meassage. It will display the validateChb error message 
-      #Open parenthesis since it is dynamic
-     lead_CHB_sub() |>
-        ggplot(aes(x= year, y= CHBTestPct, color= ageGroup))  +
-        geom_line()+
-        geom_point()+
-        theme(
-          legend.position="bottom", # move legend to bottom rather than have it on the right
-          text= element_text(size= 21), # increase font size 
-          plot.title= element_text(hjust = 0.5) # Center the title
-          )+
-        guides(color = guide_legend(title = "Age Group"))+
-        scale_color_discrete(breaks=c('<3 years', '3-<6 years', '<6 years'))+
-        #Had this
-       # scale_x_discrete(limits = lead_raw$year, guide = guide_axis(n.dodge = 2))+
-        scale_x_discrete(limit= lead_raw$year, breaks = seq(min(lead_raw$year), max(lead_raw$year), 2))+ # add breaks argument here AI generated
-        #Sets y axis for the same of all the graphs
-        scale_y_continuous(limits= c(0, 60)) +
-        labs(
-            title = paste("Blood Lead Testing (Test Year) for \n", input$par_chb, "CHB"), #\n means a new line
-            x = NULL,
-            y = "Pct Tested",
-            caption = "Data last updated, 1/15/2024"
-           )
-    })
+                                  validateChb() #Won't return red error meassage. It will display the validateChb error message 
+                                  #Open parenthesis since it is dynamic
+                                 lead_CHB_sub() |>
+                                    ggplot(aes(x= year, y= CHBTestPct, color= ageGroup))  +
+                                    geom_line()+
+                                    geom_point()+
+                                    theme(
+                                      legend.position="bottom", # move legend to bottom rather than have it on the right
+                                      text= element_text(size= 21), # increase font size 
+                                      plot.title= element_text(hjust = 0.5) # Center the title
+                                      )+
+                                    guides(color = guide_legend(title = "Age Group"))+
+                                    scale_color_discrete(breaks=c('<3 years', '3-<6 years', '<6 years'))+
+                                    #Had this
+                                   # scale_x_discrete(limits = lead_raw$year, guide = guide_axis(n.dodge = 2))+
+                                    scale_x_discrete(limit= lead_raw$year, breaks = seq(min(lead_raw$year), max(lead_raw$year), 2))+ # add breaks argument here AI generated
+                                    #Sets y axis for the same of all the graphs
+                                    scale_y_continuous(limits= c(0, 60)) +
+                                    labs(
+                                        title = paste("Blood Lead Testing (Test Year) for \n", input$par_chb, "CHB"), #\n means a new line
+                                        x = NULL,
+                                        y = "Pct Tested",
+                                        caption = "Data last updated, 1/15/2024"
+                                       )
+                                })
     
   
   
@@ -740,38 +741,34 @@ server <- function(input, output, session) {
   lead_county_sub <- reactive({lead_raw[lead_raw$location == input$par_county & 
                               lead_raw$indicator== "Blood lead testing" &
                               lead_raw$indicator.type == "Test year (annual method)",] 
-                            })
+                              })
   
   output$lead_county <-  renderPlot({
-    #Open parenthesis since it is dynamic
-    lead_county_sub() |>
-      ggplot(aes(x= year, y= pctTested, color= ageGroup)) +
-      geom_line()+
-      geom_point()+
-      theme(
-        legend.position="bottom", # move legend to bottom rather than have it on the right
-        text= element_text(size= 21), # increase font size
-        plot.title= element_text(hjust = 0.5) # Center the title
-          )+
-      guides(color = guide_legend(title = "Age Group"))+
-      scale_color_discrete(breaks=c('<3 years', '3-<6 years', '<6 years'))+
-      scale_x_discrete(limit= lead_raw$year, breaks = seq(min(lead_raw$year), max(lead_raw$year), 2))+ # add breaks argument here AI generated
-    #Sets y axis for the same of all the graphs
-      scale_y_continuous(limits= c(0, 60))+
-      labs(
-          title = paste("Blood Lead Testing (Test Year) for \n", input$par_county, "County"), #\n means a new line
-          x = NULL,
-          y = "Pct Tested"
-         # caption = "Data last updated, 1/15/2024"
-         )
-  })
+                                    #Open parenthesis since it is dynamic
+                                    lead_county_sub() |>
+                                      ggplot(aes(x= year, y= pctTested, color= ageGroup)) +
+                                      geom_line()+
+                                      geom_point()+
+                                      theme(
+                                        legend.position="bottom", # move legend to bottom rather than have it on the right
+                                        text= element_text(size= 21), # increase font size
+                                        plot.title= element_text(hjust = 0.5) # Center the title
+                                          )+
+                                      guides(color = guide_legend(title = "Age Group"))+
+                                      scale_color_discrete(breaks=c('<3 years', '3-<6 years', '<6 years'))+
+                                      scale_x_discrete(limit= lead_raw$year, breaks = seq(min(lead_raw$year), max(lead_raw$year), 2))+ # add breaks argument here AI generated
+                                    #Sets y axis for the same of all the graphs
+                                      scale_y_continuous(limits= c(0, 60))+
+                                      labs(
+                                          title = paste("Blood Lead Testing (Test Year) for \n", input$par_county, "County"), #\n means a new line
+                                          x = NULL,
+                                          y = "Pct Tested"
+                                         # caption = "Data last updated, 1/15/2024"
+                                         )
+                                  })
   
   # https://stackoverflow.com/questions/23233497/outputting-multiple-lines-of-text-with-rendertext-in-r-shiny
-    output$lead_narrative <- renderUI({
-      strRegion <- paste("You selected", "<font color=red>",input$par_region, "</font>", "as the Region")
-      strCHB <- paste("Youuuuuu selected", "<font color=red>", input$par_chb, "</font>", "as the CHB")
-      strCounty <- paste("You selected", "<font color=red>", input$par_county, "</font>", "as the County"
-                         )
+  output$lead_narrative <- renderUI({
 ####################################################################################################################################################################################
 ## LESS then 3 YEARS OF AGE
       
