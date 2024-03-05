@@ -1,6 +1,6 @@
 # Shiny Dashboard
 
-## app.R ##
+# Load Packages Start ---------------------------------------------------------------
 library(shiny)
 library(shinydashboard)
 library(ggplot2)
@@ -8,32 +8,36 @@ library(ggplot2)
 #when deployed comment out the shinyjs library since shinylive loads it 
 #library(shinyjs)
 
-# Load Data
-  
+# Load Data Start ---------------------------------------------------------------
+
 # Input parameters
   # State Community Health Services Advisory Committee as of 1_17_2024
   input_schsac_raw <- read.csv(
     "https://raw.githubusercontent.com/quinCHB/Public-Data-Sources/main/MN%20SCHSAC%20%26%20CHB%20Regions/State%20Community%20Health%20Services%20Advisory%20Committee%20as%20of%201_17_2024.csv"
   )
-  
   input_chb_raw <- read.csv(
     "https://raw.githubusercontent.com/quinCHB/Public-Data-Sources/main/MN%20SCHSAC%20%26%20CHB%20Regions/MN%20CHB%20as%20of%201_17_2024.csv"
   )
 
 #Healthy Homes
+  
+#Lead
 lead_raw <-  read.csv(
   "https://raw.githubusercontent.com/quinCHB/Public-Data-Sources/main/MN%20Public%20Health%20Data%20Access%20Portal/Healthy%20Homes/Childhood%20Lead%20Exposure.csv"
 )
+#Radon
 
+# User Interface ----------------------------------------------------------
 ui <- dashboardPage(
                     dashboardHeader(
                                     title = "MN Public Health Data Access Portal",
                                     titleWidth = 400
-                                    #disable = TRUE
+                                    #disable = TRUE #uncomment if the header should be hid
                                     ),
                     dashboardSidebar(
-                                    width = 350, #This makes the sidebar wider. However, it doesn't the input boxes seem to have a set dimension resulting in long names still wrapping
-                                    # The next items require 
+                                    width = 350, #This makes the sidebar wider. However, the input boxes seem to have a set dimension resulting in long names still wrapping
+                                    # The next items require
+                                    #The input parameters are global parameters
                                     checkboxInput(inputId = "par_hide_narrative", label = "HIDE NARRATIVE"),
                                     # Other input elements...
                                     selectInput(
@@ -60,7 +64,7 @@ ui <- dashboardPage(
                                                 multiple= FALSE,
                                                 width= 350 
                                               ),
-                                    #Sidebar is required
+                                    #Sidebar is required to have sub menus because it requires the tabName to reference
                                     sidebarMenu(
                                                 menuItem("Region & CHB Defintions", tabName = "regionChbDefinations"),
                                                 menuItem("Child Health", tabName = "childHealth"),
@@ -257,7 +261,11 @@ ui <- dashboardPage(
                                         )
                               )
                   )
+# User Interface ----------------------------------------------------------
 
+
+
+# Home Narratives ---------------------------------------------------------
 
 ##############################################################################################
 #To improve performance load these once and don't have them run every time the server runs
