@@ -76,7 +76,7 @@ ui <- dashboardPage(
                                               )
                                     ),
                       dashboardBody(
-                       # useShinyjs(), #uncomment this when running application locally but when shinylive application is deployed comment it out since shinylive shinyjs is applied to shinyLive applications 
+                        useShinyjs(), #Still need to place this function here after the application is deployed to and ran in browser 
                                     fluidRow(
                                             column(12,
                                                    tabItems(
@@ -237,7 +237,7 @@ ui <- dashboardPage(
                                                                                                           )
                                                                                                ),
                                                                                         fluidRow(
-                                                                                                #The next line inserts a line between the narrative and the data. I
+                                                                                                #The next line inserts a line between the narrative and the data.
                                                                                                 #It is added here instead of in the narrative since the narrative can have multiple columns. 
                                                                                                 #If there are multiple narrative columns and the line is added there than the line consists of multiple breaks 
                                                                                                 tags$hr(style = "border-top: 1px solid #ccc; margin-top: 20px; margin-bottom: 20px;"),
@@ -260,7 +260,7 @@ ui <- dashboardPage(
                                         )
                               )
                   )
-# User Interface ----------------------------------------------------------
+
 
 
 
