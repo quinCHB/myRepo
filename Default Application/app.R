@@ -76,7 +76,7 @@ ui <- dashboardPage(
                                               )
                                     ),
                       dashboardBody(
-                        useShinyjs(), #Still need to place this function here after the application is deployed to and ran in browser 
+                        shinyjs::useShinyjs(), #Thank you Abby Stamm at MDH for suggesting to only call one function in a package rather then the entire package 
                                     fluidRow(
                                             column(12,
                                                    tabItems(
@@ -546,18 +546,20 @@ server <- function(input, output, session) {
                                                                                 }
               )
  
+ 
  # Observe the input value of the checkbox
  observe({
    if (isTRUE(input$par_hide_narrative)) {
      # Enable the commented-out portion
-     hide("par_leadYear")
-     hide("par_stateRegionChb")
-     hide("lead_narrativeHide")
+     #shinyjs::hide(c("par_leadYear","lead_narrativeHide"))
+     shinyjs::hide("par_leadYear")
+     shinyjs::hide("par_stateRegionChb")
+     shinyjs::hide("lead_narrativeHide")
    } else {
      # Disable the portion when checkbox is unchecked
-     show("par_leadYear")
-     show("par_stateRegionChb")
-     show("lead_narrativeHide")
+     shinyjs::show("par_leadYear")
+     shinyjs::show("par_stateRegionChb")
+     shinyjs::show("lead_narrativeHide")
    }
  })
 
