@@ -70,7 +70,7 @@ ui <- dashboardPage(
                                                menuItem("Dashbaord Purpose", tabName = "tbnHomePage"),
                                                menuItem("Region & CHB Defintions", tabName = "tbnRegionChbDefinations"),
                                                menuItem("Child Health", tabName = "tbnChildHealth"),
-                                               menuItem("tbClimate", tabName = "tbnClimate"),
+                                               menuItem("Climate", tabName = "tbnClimate"),
                                                menuItem("Diseases & Conditions", tabName = "tbnDiseasesConditions"),
                                                menuItem("Environmental Health", tabName = "tbnEnvironmentalHealth"),
                                                menuItem("Health Behaviors/Risk Factors", tabName = "tbnHealthBehaviorsRiskFactors"),
