@@ -8,8 +8,7 @@
 library(shiny)
 library(shinydashboard)
 library(ggplot2)
-#Uncomment the shinyjs library when testing application so appliaction can be run locally 
-#when deployed comment out the shinyjs library since shinylive loads it 
+#Loading shinyjs really slowed down my application load time. By loading just the functions I required such as shnyjs::useShinyjs(), my application ran way faster
 #library(shinyjs)
 
 # Load Data ---------------------------------------------------------------
@@ -37,10 +36,10 @@ ui <- dashboardPage(
                                     width = 350, #This makes the sidebar wider. However, the input boxes seem to have a set dimension resulting in long names still wrapping
                                     # The next items require
                                     #The input parameters are global parameters
-                                    checkboxInput(inputId = "par_hide_narrative", label = "HIDE NARRATIVE"),
+                                    checkboxInput(inputId = "parGlobal_hideNarrative", label = "HIDE NARRATIVE"),
                                     # Other input elements...
                                     selectInput(
-                                                "par_county",
+                                                "parGlobal_county",
                                                 label= "Select County of Interest",
                                                 choices= sort(unique(input_schsac_raw$County)),
                                                 selected= "Kittson",
@@ -48,7 +47,7 @@ ui <- dashboardPage(
                                                 width= 350 
                                               ),
                                     selectInput(
-                                                "par_region",
+                                                "parGlobal_region",
                                                 label= "Select SCHSAC Region",
                                                 choices= NULL,
                                                 selected= NULL,
@@ -56,7 +55,7 @@ ui <- dashboardPage(
                                                 width= 350 
                                               ),
                                     selectInput(
-                                                "par_chb",
+                                                "parGlobal_chb",
                                                 label= "Select Community Health Board",
                                                 choices= NULL,
                                                 selected= NULL,
@@ -64,15 +63,19 @@ ui <- dashboardPage(
                                                 width= 350 
                                               ),
                                     #Sidebar is required to have sub menus because it requires the tabName to reference
+                                    #By having sidebarMenu id, you can reference it and hide other filters with shinyjs 
+                                    # The CHB and Region Filters are greyed out when onthe Region & CHB Defintions
                                     sidebarMenu(
-                                                menuItem("Region & CHB Defintions", tabName = "regionChbDefinations"),
-                                                menuItem("Child Health", tabName = "childHealth"),
-                                                menuItem("Climate", tabName = "climate"),
-                                                menuItem("Diseases & Conditions", tabName = "diseasesConditions"),
-                                                menuItem("Environmental Health", tabName = "environmentalHealth"),
-                                                menuItem("Health Behaviors/Risk Factors", tabName = "healthBehaviorsRiskFactors"),
-                                                menuItem("Health Equity", tabName = "healthEquity"),
-                                                menuItem("Healthy Homes", tabName = "healthyHomes")
+                                               id= "sbmID",
+                                               menuItem("Dashbaord Purpose", tabName = "tbnHomePage"),
+                                               menuItem("Region & CHB Defintions", tabName = "tbnRegionChbDefinations"),
+                                               menuItem("Child Health", tabName = "tbnChildHealth"),
+                                               menuItem("tbClimate", tabName = "tbnClimate"),
+                                               menuItem("Diseases & Conditions", tabName = "tbnDiseasesConditions"),
+                                               menuItem("Environmental Health", tabName = "tbnEnvironmentalHealth"),
+                                               menuItem("Health Behaviors/Risk Factors", tabName = "tbnHealthBehaviorsRiskFactors"),
+                                               menuItem("Health Equity", tabName = "tbnHealthEquity"),
+                                               menuItem("Healthy Homes", tabName = "tbnHealthyHomes")
                                               )
                                     ),
                       dashboardBody(
@@ -80,11 +83,30 @@ ui <- dashboardPage(
                                     fluidRow(
                                             column(12,
                                                    tabItems(
+                                                           ####################################################################################
+                                                           tabItem(
+                                                                   tabName = "tbtbnHomePage", #tabName is what ties the menuItem to the tabItem
+                                                                   tabsetPanel(
+                                                                               tabPanel(
+                                                                                       "Home Page",
+                                                                                       fluidRow(
+                                                                                                 # Narrative section explaining the purpose of the dashboard
+                                                                                                 column(
+                                                                                                       width = 12,
+                                                                                                       h1("Welcome to the Landing Page for This Awesome Dashboard...Subjective of Course :)"),
+                                                                                                       h3("There are three filters on the left: Select County of Interest, Select SCHSAC Region, & Select Community Health Board."),
+                                                                                                       h3(HTML("Updating the Select County of Interest filter, wll highlight the county in <font color=red>red</font> while the Regions will remain in <b>bold</b>.")),
+                                                                                                       h3("For this tab, nothing will change if the Select SCHSAC Region and Select Community Health Board filters are updated."),
+                                                                                                       h3("The purpose for this tab is to provide a quick reference for what counties fall under which region."),
+                                                                                                      )
+                                                                                               )
+                                                                                     )
+                                                                              )
+                                                                    ),
                                                           ####################################################################################
                                                           tabItem(
-                                                                  tabName = "regionChbDefinations",
+                                                                  tabName = "tbnRegionChbDefinations",
                                                                   tabsetPanel(
-                                                                              id= "willThisWork",
                                                                               tabPanel(
                                                                                       "Region",
                                                                                       fluidRow(
@@ -126,7 +148,7 @@ ui <- dashboardPage(
                                                                   ),
                                                 ##########################################################################
                                                             tabItem(
-                                                                    tabName = "childHealth",
+                                                                    tabName = "tbnChildHealth",
                                                                     #Dynamic Narrative for child health
                                                                     h5("testing 123"),
   
@@ -136,68 +158,68 @@ ui <- dashboardPage(
                                                                               tabPanel("Health Inequities in Childhood Asthma"),
                                                                               tabPanel("Birth Defects"),
                                                                               tabPanel("Childhood Lead Exposure"),
-                                                                              tabPanel("Free/Reduced Price Lunch Eligibility", h5("testing 123")),
-                                                                              tabPanel("Immunizations", h5("testing 123")),
-                                                                              tabPanel("Oral Health", h5("testing 123"))
+                                                                              tabPanel("Free/Reduced Price Lunch Eligibility"),
+                                                                              tabPanel("Immunizations"),
+                                                                              tabPanel("Oral Health")
                                                                               )
                                                                      ),
                                                 ####################################################################################
                                                               tabItem(
-                                                                      tabName = "climate",
+                                                                      tabName = "tbnClimate",
                                                                       tabsetPanel(
                                                                                 tabPanel("Air Quality"),
                                                                                 tabPanel("Cold-related Illness"),
-                                                                                tabPanel("Climate-related Environmental Health Concerns"),
+                                                                                tabPanel("tbClimate-related Environmental Health Concerns"),
                                                                                 tabPanel("Heat-related Illness"),
-                                                                                tabPanel("Hot Weather", h5("testing 123")),
-                                                                                tabPanel("Pollen", h5("testing 123"))
+                                                                                tabPanel("Hot Weather"),
+                                                                                tabPanel("Pollen")
                                                                                 )
                                                                       ),
                                                 ####################################################################################
                                                               tabItem(
-                                                                      tabName = "diseasesConditions",
+                                                                      tabName = "tbnDiseasesConditions",
                                                                       tabsetPanel(
                                                                                   tabPanel("Asthma"),
                                                                                   tabPanel("Birth Defects"),
                                                                                   tabPanel("Cancer"),
                                                                                   tabPanel("Carbon Monoxide (CO) Poisoning"),
-                                                                                  tabPanel("Chronic Obstructive Pulmonary Disease (COPD)", h5("testing 123")),
-                                                                                  tabPanel("Diabetes", h5("testing 123")),
+                                                                                  tabPanel("Chronic Obstructive Pulmonary Disease (COPD)"),
+                                                                                  tabPanel("Diabetes"),
                                                                                   tabPanel("Heart Attacks"),
-                                                                                  tabPanel("Heat-related Illness", h5("testing 123")),
-                                                                                  tabPanel("Immunizations", h5("testing 123")),
+                                                                                  tabPanel("Heat-related Illness"),
+                                                                                  tabPanel("Immunizations"),
                                                                                   tabPanel("Oral Health")
                                                                                   )
                                                                       ),
                                                 ####################################################################################
                                                               tabItem(
-                                                                      tabName = "environmentalHealth",
+                                                                      tabName = "tbnEnvironmentalHealth",
                                                                       tabsetPanel(
                                                                                 tabPanel("Air Quality"),
                                                                                 tabPanel("Biomonitoring: Chemicals in people"),
                                                                                 tabPanel("Cold-related Illness"),
                                                                                 tabPanel("Drinking Water Quality"),
-                                                                                tabPanel("Environmental Justice", h5("testing 123")),
-                                                                                tabPanel("Heat-related Illness", h5("testing 123")),
+                                                                                tabPanel("Environmental Justice"),
+                                                                                tabPanel("Heat-related Illness"),
                                                                                 tabPanel("Pesticide Poisoning"),
-                                                                                tabPanel("Traffic", h5("testing 123"))
+                                                                                tabPanel("Traffic")
                                                                                 )
                                                                       ),
                                                   ####################################################################################
                                                               tabItem(
-                                                                      tabName = "healthBehaviorsRiskFactors",
+                                                                      tabName = "tbnHealthBehaviorsRiskFactors",
                                                                       tabsetPanel(
                                                                                 tabPanel("Health Insurance"),
                                                                                 tabPanel("Immunizations"),
                                                                                 tabPanel("Obesity"),
                                                                                 tabPanel("Oral Health"),
-                                                                                tabPanel("Poverty & Income", h5("testing 123")),
-                                                                                tabPanel("Smoking", h5("testing 123"))
+                                                                                tabPanel("Poverty & Income"),
+                                                                                tabPanel("Smoking")
                                                                                 )
                                                                       ),
                                                   ####################################################################################
                                                               tabItem(
-                                                                      tabName = "healthEquity",
+                                                                      tabName = "tbnHealthEquity",
                                                                       tabsetPanel(
                                                                                 tabPanel("Health Equity"),
                                                                                 tabPanel("Health Inequities in Childhood Lead Exposure"),
@@ -206,8 +228,9 @@ ui <- dashboardPage(
                                                                       ),
                                                   ####################################################################################
                                                               tabItem(
-                                                                      tabName = "healthyHomes",
+                                                                      tabName = "tbnHealthyHomes",
                                                                       tabsetPanel(
+                                                                                id="tspIdtbnHealthyHomes",
                                                                                 tabPanel("Carbon Monoxide (CO) Poisoning"),
                                                                                 tabPanel("Childhood Lead Exposure",
                                                                                          fluidRow(
@@ -222,7 +245,7 @@ ui <- dashboardPage(
                                                                                                                      multiple= FALSE
                                                                                                                     ),
                                                                                                          selectInput(
-                                                                                                                     "par_stateRegionChb",
+                                                                                                                     "par_leadStateRegionChb",
                                                                                                                      label= "Select Comparison",
                                                                                                                      choices= c("All", "CHB", "Region", "State"),
                                                                                                                      selected= "All",
@@ -251,7 +274,7 @@ ui <- dashboardPage(
                                                                                       ),
                                                                                 tabPanel("Drinking Water Quality"),
                                                                                 tabPanel("Pesticide Poisoning"),
-                                                                                tabPanel("Radon", h5("testing 123")),
+                                                                                tabPanel("Radon"),
                                                                                 )
                                                                     )
                                                           )
@@ -358,10 +381,8 @@ lead_CHBComplete$CHBTestPct <- round(lead_CHBComplete$chbNumTested/lead_CHBCompl
 server <- function(input, output, session) {
   
   output$region_narrative <- renderUI({
-                                      
-                                      
                                       # Replace the values that are equal to input county by adding the font tab
-                                      schsac_raw$County[schsac_raw$County == input$par_county] <-  paste("<font color=red>", schsac_raw$County[schsac_raw$County == input$par_county], "</font>")
+                                      schsac_raw$County[schsac_raw$County == input$parGlobal_county] <-  paste("<font color=red>", schsac_raw$County[schsac_raw$County == input$parGlobal_county], "</font>")
                                       
                                       # Split the data frame by the group column
                                       schsac_split <- split(schsac_raw , schsac_raw$Region)
@@ -395,7 +416,7 @@ server <- function(input, output, session) {
   
   output$chb_narrative_01 <- renderUI({
                                       # Replace the values that are equal to input county by adding the font tab
-                                      chb_raw_01$County[chb_raw_01$County == input$par_county] <-  paste("<font color=red>", chb_raw_01$County[chb_raw_01$County == input$par_county], "</font>")
+                                      chb_raw_01$County[chb_raw_01$County == input$parGlobal_county] <-  paste("<font color=red>", chb_raw_01$County[chb_raw_01$County == input$parGlobal_county], "</font>")
 
                                       # Split the data frame by the chb
                                       chb_split <- split(chb_raw_01 , chb_raw_01$CHB)
@@ -428,7 +449,7 @@ server <- function(input, output, session) {
   
   output$chb_narrative_02 <- renderUI({
                                         # Replace the values that are equal to input county by adding the font tab
-                                        chb_raw_02$County[chb_raw_02$County == input$par_county] <-  paste("<font color=red>", chb_raw_02$County[chb_raw_02$County == input$par_county], "</font>")
+                                        chb_raw_02$County[chb_raw_02$County == input$parGlobal_county] <-  paste("<font color=red>", chb_raw_02$County[chb_raw_02$County == input$parGlobal_county], "</font>")
                                         
                                         # Split the data frame by the chb
                                         chb_split <- split(chb_raw_02 , chb_raw_02$CHB)
@@ -459,10 +480,10 @@ server <- function(input, output, session) {
                                         HTML(paste(chb_result, collapse =  "<br/>"))
                                       })
   # Update the region input based on the county input
-  observeEvent(input$par_county, {
+  observeEvent(input$parGlobal_county, {
                                 # In case data source doesn't have the same number of counties Null, Blank, Minnesota are examples. 
-                                # Currently, the county source is from the region datasource but it if ever changes this will handle it 
-                                if(input$par_county %in% input_schsac_raw$County) {
+                                # Currently, the county source is from the region datasource but if it ever changes this will handle it 
+                                if(input$parGlobal_county %in% input_schsac_raw$County) {
                                                                                 # Create a vector for all region
                                                                                 allRegions <- input_schsac_raw$Region 
                                                                                 
@@ -470,10 +491,10 @@ server <- function(input, output, session) {
                                                                                 regionCounties <- input_schsac_raw$County
                                                                                 
                                                                                 # Reorder the region by the county input
-                                                                                orderedRegions <- allRegions[order(regionCounties == input$par_county, decreasing = TRUE)]
+                                                                                orderedRegions <- allRegions[order(regionCounties == input$parGlobal_county, decreasing = TRUE)]
                                                                                 
                                                                                 # Reorder the counties by the county input
-                                                                                orderedCounties <- regionCounties[order(regionCounties == input$par_county, decreasing = TRUE)]
+                                                                                orderedCounties <- regionCounties[order(regionCounties == input$parGlobal_county, decreasing = TRUE)]
                                                                                 
                                                                                 # The commented line below will produce a list of all regions with counties in parenthesis. Initially, this was a good thought process, it is not user friendly and can cause confusion
                                                                                 #labeledRegions <-  paste0(orderedRegions, " (", orderedCounties, ")") # if the following is used, only passes one orderRegions object #setNames(orderedRegions, paste0(orderedRegions, " (", orderedCounties, ")"))
@@ -482,14 +503,14 @@ server <- function(input, output, session) {
                                                                                 
                                                                                 # Update the choices and selected values of the country input
                                                                                 updateSelectInput(
-                                                                                                  session, "par_region",
+                                                                                                  session, "parGlobal_region",
                                                                                                   choices = labeledRegions,
                                                                                                   selected = labeledRegions[1]
                                                                                                   )
                                                                                 }
                                   else {
                                         updateSelectInput(
-                                                          session, "par_region",
+                                                          session, "parGlobal_region",
                                                           choices = "",
                                                           selected = ""
                                                         )
@@ -498,9 +519,9 @@ server <- function(input, output, session) {
                )
   
   # Update the chb input based on the county input
- observeEvent(input$par_county, {
+ observeEvent(input$parGlobal_county, {
                                 # In case data source doesn't have the same number of counties Null, Blank, Minnesota are examples
-                                if(input$par_county %in% input_chb_raw$County) {
+                                if(input$parGlobal_county %in% input_chb_raw$County) {
                                                                               # Create a vector of all CHBS
                                                                               allCHBS <- input_chb_raw$CHB
                                                                               
@@ -508,24 +529,24 @@ server <- function(input, output, session) {
                                                                               chbCounties <- input_chb_raw$County
                                                                               
                                                                               # Reorder the region by the county input
-                                                                              orderedChbs <- allCHBS[order(chbCounties == input$par_county, decreasing = TRUE)]
+                                                                              orderedChbs <- allCHBS[order(chbCounties == input$parGlobal_county, decreasing = TRUE)]
                                                                               
                                                                               # Reorder the continents by the continent input
-                                                                              orderedCounties <- chbCounties[order(chbCounties == input$par_county, decreasing = TRUE)]
+                                                                              orderedCounties <- chbCounties[order(chbCounties == input$parGlobal_county, decreasing = TRUE)]
                                                                               
                                                                               # Create a named vector of countries with their continent names as labels
                                                                               labeledChbs <- setNames(orderedChbs, paste0(orderedChbs)) #see regions above for more explanation about this line 
                                                                               
                                                                               # Update the choices and selected values of the country input
                                                                               updateSelectInput(
-                                                                                                session, "par_chb",
+                                                                                                session, "parGlobal_chb",
                                                                                                 choices = labeledChbs,
                                                                                                 selected = labeledChbs[1]
                                                                                                 )
                                                                             }
                                 else {
                                       updateSelectInput(
-                                                        session, "par_chb",
+                                                        session, "parGlobal_chb",
                                                         choices = "",
                                                         selected = ""
                                                         )
@@ -533,36 +554,37 @@ server <- function(input, output, session) {
                                 }
             )
  
- # # Hide Narrative when checkbox is selected
- #https://stackoverflow.com/questions/60054418/shiny-tab-hide-show
- observeEvent(input$par_hide_narrative, ignoreNULL = FALSE, ignoreInit = TRUE, {
-                                                                                if(isTRUE(input$par_hide_narrative)) {
-                                                                                                                      hideTab(inputId = "willThisWork" , target ="Region")
-                                                                                                                      } 
-                                                                               else {
-                                                                                    showTab(inputId = "willThisWork" , target ="Region")
-                                                                                    }
-                                                                                           
-                                                                                }
-              )
+ # Observe what sidebar the user is on and only allow for read only access to global parameters
+ observe({
+          if(input$sbmID %in% c("tbnHomePage","tbnRegionChbDefinations")) # it requires an ID of sidebarMenu (in this case)
+            { 
+            shinyjs::disable("parGlobal_region")
+            shinyjs::disable("parGlobal_chb")
+            } 
+          else 
+            {
+            shinyjs::enable("parGlobal_region")
+            shinyjs::enable("parGlobal_chb")
+            }
+        })
  
  
  # Observe the input value of the checkbox
  observe({
-   if (isTRUE(input$par_hide_narrative)) {
-     # Enable the commented-out portion
-     #shinyjs::hide(c("par_leadYear","lead_narrativeHide"))
-     shinyjs::hide("par_leadYear")
-     shinyjs::hide("par_stateRegionChb")
-     shinyjs::hide("lead_narrativeHide")
-   } else {
-     # Disable the portion when checkbox is unchecked
-     shinyjs::show("par_leadYear")
-     shinyjs::show("par_stateRegionChb")
-     shinyjs::show("lead_narrativeHide")
-   }
+         if(input$sbmID == "tbnHealthyHomes" & input$tspIdtbnHealthyHomes == "Childhood Lead Exposure" & isTRUE(input$parGlobal_hideNarrative))
+            {
+           #Toggle does not seem to work. It works for one interation and then it doesn't function correcly with the checkbox which is why there are two if statements
+             shinyjs::hide("par_leadYear") 
+             shinyjs::hide("par_leadStateRegionChb")
+             shinyjs::hide("lead_narrativeHide")
+            }
+         # if(input$sbmID == "tbnHealthyHomes" & input$tspIdtbnHealthyHomes == "Childhood Lead Exposure" & isFALSE(input$parGlobal_hideNarrative))
+         #   {
+         #     shinyjs::show("par_leadYear") 
+         #     shinyjs::show("par_leadStateRegionChb")
+         #     shinyjs::show("lead_narrativeHide")
+         #   }
  })
-
 
   #Healthy Homes
   
@@ -590,7 +612,7 @@ server <- function(input, output, session) {
                                           )+
                                     guides(color = guide_legend(title = "Age Group"))+
                                     scale_color_discrete(breaks= c('<3 years', '3-<6 years', '<6 years'))+
-                                    scale_x_discrete(limit= lead_raw$year, breaks = seq(min(lead_raw$year), max(lead_raw$year), 2))+ # add breaks argument here CoPilot AI generated
+                                    scale_x_discrete(limit= lead_raw$year, breaks = seq(min(lead_raw$year), max(lead_raw$year), 2))+ # add breaks argument here Microsoft Copilot AI generated
                                    #Sets y axis for the same of all the graphs
                                     scale_y_continuous(limits= c(0, 60)) +
                                     labs(
@@ -657,7 +679,7 @@ server <- function(input, output, session) {
    lead_RegionComplete$regionTestPct <- round(lead_RegionComplete$regionNumTested/lead_RegionComplete$regionDenominator*100,2)
  # #  
    #Reactive Data
-  lead_region_sub <- reactive({lead_RegionComplete[input$par_region == lead_RegionComplete$Region & #Changed variable so no longer need to use gsub
+  lead_region_sub <- reactive({lead_RegionComplete[input$parGlobal_region == lead_RegionComplete$Region & #Changed variable so no longer need to use gsub
                                                    lead_RegionComplete$indicator== "Blood lead testing"&
                                                    lead_RegionComplete$indicator.type == "Test year (annual method)",] })
 
@@ -674,11 +696,11 @@ server <- function(input, output, session) {
       )+
       guides(color = guide_legend(title = "Age Group"))+
       scale_color_discrete(breaks=c('<3 years', '3-<6 years', '<6 years'))+
-      scale_x_discrete(limit= lead_raw$year, breaks = seq(min(lead_raw$year), max(lead_raw$year), 2))+ # add breaks argument here AI generated
+      scale_x_discrete(limit= lead_raw$year, breaks = seq(min(lead_raw$year), max(lead_raw$year), 2))+ # add breaks argument here Microsoft Copilot AI generated
     #Sets y axis for the same of all the graphs
       scale_y_continuous(limits= c(0, 60)) +
       labs(
-          title = paste("Blood Lead Testing (Test Year) for \n", input$par_region, "Region"), #\n means a new line 
+          title = paste("Blood Lead Testing (Test Year) for \n", input$parGlobal_region, "Region"), #\n means a new line 
           x = NULL,
           y = "Pct Tested"
           #caption = "Data last updated, 1/15/2024"
@@ -691,18 +713,18 @@ server <- function(input, output, session) {
     validateChb <- reactive({
                             validate(
                                     need(
-                                        input$par_chb == lead_CHBComplete$CHB, paste("There is no data for ", input$par_chb)
+                                        input$parGlobal_chb == lead_CHBComplete$CHB, paste("There is no data for ", input$parGlobal_chb)
                                         )
                                     )
     })
     
     #Reactive Data
     # validateChb <- reactive({
-    #                         if(input$par_chb == lead_CHBComplete$CHB
+    #                         if(input$parGlobal_chb == lead_CHBComplete$CHB
     #                            ) 
     #                             {
     #                             validate(
-    #                                     paste("There is no data for ", input$par_chb)
+    #                                     paste("There is no data for ", input$parGlobal_chb)
     #                                     )
     #                             }
     #                       })
@@ -710,7 +732,7 @@ server <- function(input, output, session) {
     #Reactive Data
     lead_CHB_sub <- reactive({
                               
-                              lead_CHBComplete[input$par_chb == lead_CHBComplete$CHB  &
+                              lead_CHBComplete[input$parGlobal_chb == lead_CHBComplete$CHB  &
                               lead_CHBComplete$indicator== "Blood lead testing"&
                               lead_CHBComplete$indicator.type == "Test year (annual method)",] 
                             })
@@ -732,11 +754,11 @@ server <- function(input, output, session) {
                                     scale_color_discrete(breaks=c('<3 years', '3-<6 years', '<6 years'))+
                                     #Had this
                                    # scale_x_discrete(limits = lead_raw$year, guide = guide_axis(n.dodge = 2))+
-                                    scale_x_discrete(limit= lead_raw$year, breaks = seq(min(lead_raw$year), max(lead_raw$year), 2))+ # add breaks argument here AI generated
+                                    scale_x_discrete(limit= lead_raw$year, breaks = seq(min(lead_raw$year), max(lead_raw$year), 2))+ # add breaks argument here Microsoft Copilot AI generated
                                     #Sets y axis for the same of all the graphs
                                     scale_y_continuous(limits= c(0, 60)) +
                                     labs(
-                                        title = paste("Blood Lead Testing (Test Year) for \n", input$par_chb, "CHB"), #\n means a new line
+                                        title = paste("Blood Lead Testing (Test Year) for \n", input$parGlobal_chb, "CHB"), #\n means a new line
                                         x = NULL,
                                         y = "Pct Tested",
                                         caption = "Data last updated, 1/15/2024"
@@ -747,7 +769,7 @@ server <- function(input, output, session) {
   
   
   # Get county data subset
-  lead_county_sub <- reactive({lead_raw[lead_raw$location == input$par_county & 
+  lead_county_sub <- reactive({lead_raw[lead_raw$location == input$parGlobal_county & 
                               lead_raw$indicator== "Blood lead testing" &
                               lead_raw$indicator.type == "Test year (annual method)",] 
                               })
@@ -765,11 +787,11 @@ server <- function(input, output, session) {
                                           )+
                                       guides(color = guide_legend(title = "Age Group"))+
                                       scale_color_discrete(breaks=c('<3 years', '3-<6 years', '<6 years'))+
-                                      scale_x_discrete(limit= lead_raw$year, breaks = seq(min(lead_raw$year), max(lead_raw$year), 2))+ # add breaks argument here AI generated
+                                      scale_x_discrete(limit= lead_raw$year, breaks = seq(min(lead_raw$year), max(lead_raw$year), 2))+ # add breaks argument here Microsoft Copilot AI generated
                                     #Sets y axis for the same of all the graphs
                                       scale_y_continuous(limits= c(0, 60))+
                                       labs(
-                                          title = paste("Blood Lead Testing (Test Year) for \n", input$par_county, "County"), #\n means a new line
+                                          title = paste("Blood Lead Testing (Test Year) for \n", input$parGlobal_county, "County"), #\n means a new line
                                           x = NULL,
                                           y = "Pct Tested"
                                          # caption = "Data last updated, 1/15/2024"
@@ -853,7 +875,7 @@ server <- function(input, output, session) {
       
       strAgeLessThanThreeRegion <- paste0(
                                       strAgeLessThanThreeRegion,
-                                      input$par_region, 
+                                      input$parGlobal_region, 
                                       "</font> region ",
                                       unique(lead_region_sub()[lead_region_sub()$year == input$par_leadYear & lead_region_sub()$ageGroup == "<3 years", ]$regionTestPct),
                                       "% (",
@@ -888,7 +910,7 @@ server <- function(input, output, session) {
 
       strAgeLessThanThreeChb <- paste0(
                                       strAgeLessThanThreeChb,
-                                      input$par_chb, 
+                                      input$parGlobal_chb, 
                                       "</font> ",
                                       ifelse(
                                             #Any checks if any true values exist. is.na() did not work correctly
@@ -945,11 +967,11 @@ server <- function(input, output, session) {
                                           0
                                           ),
                                     ") of <font color=red>",
-                                    input$par_county, 
+                                    input$parGlobal_county, 
                                     "</font> residents <b>under the age of 3 </b>had their blood lead levels tested which is",
-                                    if(input$par_stateRegionChb %in% c("All","CHB")){strAgeLessThanThreeChb},
-                                    if(input$par_stateRegionChb %in% c("All","Region")){strAgeLessThanThreeRegion},
-                                    if(input$par_stateRegionChb %in% c("All","State")){strAgeLessThanThreeState}
+                                    if(input$par_leadStateRegionChb %in% c("All","CHB")){strAgeLessThanThreeChb},
+                                    if(input$par_leadStateRegionChb %in% c("All","Region")){strAgeLessThanThreeRegion},
+                                    if(input$par_leadStateRegionChb %in% c("All","State")){strAgeLessThanThreeState}
                                   )
       
 ####################################################################################################################################################################################
@@ -1027,7 +1049,7 @@ server <- function(input, output, session) {
       
       strAgeThreeToSixRegion <- paste0(
                                       strAgeThreeToSixRegion,
-                                      input$par_region, 
+                                      input$parGlobal_region, 
                                       "</font> ",
                                       unique(lead_region_sub()[lead_region_sub()$year == input$par_leadYear & lead_region_sub()$ageGroup == "3-<6 years", ]$regionTestPct),
                                       "% (",
@@ -1062,7 +1084,7 @@ server <- function(input, output, session) {
 
       strAgeThreeToSixChb <- paste0(
                                   strAgeThreeToSixChb,
-                                  input$par_chb,
+                                  input$parGlobal_chb,
                                   "</font> ",
                                   ifelse(
                                         #Any checks if any true values exist. is.na() did not work correctly
@@ -1118,11 +1140,11 @@ server <- function(input, output, session) {
                                       0
                                       ),
                                 ") of <font color=red>",
-                                input$par_county, 
+                                input$parGlobal_county, 
                                 "</font> residents ages <b>3 to 6 </b>had their blood lead levels tested which is",
-                                if(input$par_stateRegionChb %in% c("All","CHB")){strAgeThreeToSixChb},
-                                if(input$par_stateRegionChb %in% c("All","Region")){strAgeThreeToSixRegion},
-                                if(input$par_stateRegionChb %in% c("All","State")){strAgeThreeToSixState}
+                                if(input$par_leadStateRegionChb %in% c("All","CHB")){strAgeThreeToSixChb},
+                                if(input$par_leadStateRegionChb %in% c("All","Region")){strAgeThreeToSixRegion},
+                                if(input$par_leadStateRegionChb %in% c("All","State")){strAgeThreeToSixState}
                               )
 ####################################################################################################################################################################################
 ## Less Than 6 YEARS OF AGE
@@ -1198,7 +1220,7 @@ server <- function(input, output, session) {
       
       strAgeLessThanSixRegion <- paste0(
                                         strAgeLessThanSixRegion,
-                                        input$par_region, 
+                                        input$parGlobal_region, 
                                         "</font> ",
                                         unique(lead_region_sub()[lead_region_sub()$year == input$par_leadYear & lead_region_sub()$ageGroup == "<6 years", ]$regionTestPct),
                                         "% (",
@@ -1233,7 +1255,7 @@ server <- function(input, output, session) {
       
       strAgeLessThanSixChb <- paste0(
                                     strAgeLessThanSixChb,
-                                    input$par_chb,
+                                    input$parGlobal_chb,
                                     "</font> ",
                                     ifelse(
                                           #Any checks if any true values exist. is.na() did not work correctly
@@ -1289,11 +1311,11 @@ server <- function(input, output, session) {
                                         0
                                         ),
                                   ") of <font color=red>",
-                                  input$par_county, 
+                                  input$parGlobal_county, 
                                   "</font> residents <b>under the age of 6 </b> had their blood lead levels tested which is",
-                                  if(input$par_stateRegionChb %in% c("All","CHB")){strAgeLessThanSixChb},
-                                  if(input$par_stateRegionChb %in% c("All","Region")){strAgeLessThanSixRegion},
-                                  if(input$par_stateRegionChb %in% c("All","State")){strAgeLessThanSixState}
+                                  if(input$par_leadStateRegionChb %in% c("All","CHB")){strAgeLessThanSixChb},
+                                  if(input$par_leadStateRegionChb %in% c("All","Region")){strAgeLessThanSixRegion},
+                                  if(input$par_leadStateRegionChb %in% c("All","State")){strAgeLessThanSixState}
                               )
       HTML(paste
                 (
