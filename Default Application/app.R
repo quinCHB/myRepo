@@ -79,13 +79,13 @@ ui <- dashboardPage(
                                               )
                                     ),
                       dashboardBody(
-                        shinyjs::useShinyjs(), #Thank you Abby Stamm at MDH for suggesting to only call one function in a package rather then the entire package 
+                        shinyjs::useShinyjs(), #Thank you Abby Stamm at MDH for suggesting to only call one function in a package rather then load entire package 
                                     fluidRow(
                                             column(12,
                                                    tabItems(
                                                            ####################################################################################
                                                            tabItem(
-                                                                   tabName = "tbtbnHomePage", #tabName is what ties the menuItem to the tabItem
+                                                                   tabName = "tbnHomePage", #tabName is what ties the menuItem to the tabItem
                                                                    tabsetPanel(
                                                                                tabPanel(
                                                                                        "Home Page",
@@ -578,12 +578,12 @@ server <- function(input, output, session) {
              shinyjs::hide("par_leadStateRegionChb")
              shinyjs::hide("lead_narrativeHide")
             }
-         # if(input$sbmID == "tbnHealthyHomes" & input$tspIdtbnHealthyHomes == "Childhood Lead Exposure" & isFALSE(input$parGlobal_hideNarrative))
-         #   {
-         #     shinyjs::show("par_leadYear") 
-         #     shinyjs::show("par_leadStateRegionChb")
-         #     shinyjs::show("lead_narrativeHide")
-         #   }
+         if(input$sbmID == "tbnHealthyHomes" & input$tspIdtbnHealthyHomes == "Childhood Lead Exposure" & isFALSE(input$parGlobal_hideNarrative))
+           {
+             shinyjs::show("par_leadYear")
+             shinyjs::show("par_leadStateRegionChb")
+             shinyjs::show("lead_narrativeHide")
+           }
  })
 
   #Healthy Homes
