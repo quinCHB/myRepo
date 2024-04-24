@@ -5,7 +5,10 @@
 
 # install.packages("pak")
 pak::pak("posit-dev/r-shinylive")
-pak::pak("rstudio/httpuv")
+#pak::pak("rstudio/httpuv")
+library(httpuv)
+
+remove.packages(rstudio/httpuv)
 
 # Version for the packages
 # Uncomment the next two lines to see versions

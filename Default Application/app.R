@@ -8,20 +8,20 @@
 library(shiny)
 library(shinydashboard)
 library(ggplot2)
+library(dplyr)
 #Loading shinyjs really slowed down my application load time. By loading just the functions I required such as shnyjs::useShinyjs(), my application ran way faster
 #library(shinyjs)
 
+
 # Load Data ---------------------------------------------------------------
 
-# Input parameters
 # State Community Health Services Advisory Committee as of 1_17_2024
 df_schsacRaw <- read.csv("https://raw.githubusercontent.com/quinCHB/Public-Data-Sources/main/MN%20SCHSAC%20%26%20CHB%20Regions/State%20Community%20Health%20Services%20Advisory%20Committee%20as%20of%201_17_2024.csv")
 # Community Health Board as of 1_17_2024
 df_chbRaw <- read.csv("https://raw.githubusercontent.com/quinCHB/Public-Data-Sources/main/MN%20SCHSAC%20%26%20CHB%20Regions/Community%20Health%20Board%20as%20of%201_17_2024.csv")
 
-### *** Healthy Homes ***
-
-#Lead
+#Healthy Homes
+#* Childhood Lead Exposure
 df_leadRaw <-  read.csv("https://raw.githubusercontent.com/quinCHB/Public-Data-Sources/main/MN%20Public%20Health%20Data%20Access%20Portal/Healthy%20Homes/Childhood%20Lead%20Exposure.csv")
 #Radon
 
@@ -83,7 +83,6 @@ ui <- dashboardPage(
     fluidRow(
       column(12,
              tabItems(
-               ####################################################################################
                tabItem(
                  tabName = "tn_homePage", #tabName is what ties the menuItem to the tabItem
                  tabsetPanel(
@@ -112,14 +111,13 @@ ui <- dashboardPage(
                    )
                  )
                ),
-               ####################################################################################
                tabItem(
                  tabName = "tn_regionChbDefinations",
                  tabsetPanel(
                    tabPanel(
                      "Region",
                      fluidRow(
-                       # Narrative section explaining the purpose of the dashboard
+                       # Narrative section explaining the dashboard purpose
                        column(
                          width = 12,
                          h3(HTML("Updating the Select County of Interest filter, wll highlight the county in <font color=red>red</font> while the Regions will remain in <b>bold</b>.")),
@@ -153,7 +151,6 @@ ui <- dashboardPage(
                    )
                  )
                ),
-               ##########################################################################
                tabItem(
                  tabName = "tn_childHealth",
                  tabsetPanel(
@@ -166,7 +163,6 @@ ui <- dashboardPage(
                    tabPanel("Oral Health")
                  )
                ),
-               ####################################################################################
                tabItem(
                  tabName = "tb_climate",
                  tabsetPanel(
@@ -178,7 +174,6 @@ ui <- dashboardPage(
                    tabPanel("Pollen")
                  )
                ),
-               ####################################################################################
                tabItem(
                  tabName = "tn_diseasesConditions",
                  tabsetPanel(
@@ -194,7 +189,6 @@ ui <- dashboardPage(
                    tabPanel("Oral Health")
                  )
                ),
-               ####################################################################################
                tabItem(
                  tabName = "tn_environmentalHealth",
                  tabsetPanel(
@@ -208,7 +202,6 @@ ui <- dashboardPage(
                    tabPanel("Traffic")
                  )
                ),
-               ####################################################################################
                tabItem(
                  tabName = "tn_healthBehaviorsRiskFactors",
                  tabsetPanel(
@@ -220,7 +213,6 @@ ui <- dashboardPage(
                    tabPanel("Smoking")
                  )
                ),
-               ####################################################################################
                tabItem(
                  tabName = "tn_HealthEquity",
                  tabsetPanel(
@@ -229,7 +221,6 @@ ui <- dashboardPage(
                    tabPanel("Health Inequities in Childhood Asthma")
                  )
                ),
-               ####################################################################################
                tabItem(
                  tabName = "tn_healthyHomes",
                  tabsetPanel(
@@ -291,35 +282,62 @@ ui <- dashboardPage(
                  )
                )
              )
-             
       )
     )
   )
 )
 
-
-
-
-
+# Preload Data prior to Server -----------------------------
 #To improve performance load these once and don't have them run every time the server runs
 
-###########################Region & County Definitions#########################################################
+
+#* Region & County Definitions ---------------------------------------------
 # Create region data frame for global narrative reference
 schsac_raw <- df_schsacRaw
 schsac_raw$Region <-  paste("<b>", schsac_raw$Region, "</b>") #Bold Regions so it is easier to understand narrative
 
-## CHB Narrative 01 (It is split in half so it displays in two nice columns on the UI
 # Create chb data frame for global narrative reference
+# CHB Narrative 01 (It is split in half so it displays in two nice columns on the UI
 chb_raw_01 <- df_chbRaw[1:33,]
 chb_raw_01$CHB <-  paste("<b>", chb_raw_01$CHB, "</b>") #Bold CHBs so it is easier to understand narrative
-## CHB Narrative 02 (It is split in half so it displays in two nice columns on the UI
+
 # Create chb data frame for global narrative reference
+# CHB Narrative 02 (It is split in half so it displays in two nice columns on the UI
 chb_raw_02 <- df_chbRaw[34:nrow(df_chbRaw),] # :nrow means it goes to the end of the data frame
 chb_raw_02$CHB <-  paste("<b>", chb_raw_02$CHB, "</b>") #Bold CHBs so it is easier to understand narrative
 
-################################### Healthy Homes #########################################
+#* Healthy Homes -----------------------------
 
 #Childhood Lead Exposure
+#Region
+# Combine Region
+# A lot of sources online say to use all= TRUE after the by condition for an inner. 
+# This does not appear to be correct. It seems like it is executing an outer join not an inner join
+lead_Region <- merge(x= df_leadRaw, y= df_schsacRaw, by.x= "location", by.y= "County") #, all = TRUE) Don't include the all = TRUE 
+
+# #https://www.youtube.com/watch?v=zmiC7X9fUmo
+# First sum number tested
+# Next sum denominator
+#Combine in a completed data set
+
+#Sum will be applied to numTested and it will (~) be subsetted by everything after
+lead_RegionGrpTested <-  aggregate(numTested~ ageGroup+ Region+ year+ indicator+ indicator.type+ ebllDescription, lead_Region, FUN=sum)
+#Rename grouped field
+colnames(lead_RegionGrpTested)[colnames(lead_RegionGrpTested) == 'numTested'] <- 'regionNumTested'
+
+lead_RegionGrpDenominator <-  aggregate(denominator~ ageGroup+ Region+ year+ indicator+ indicator.type+ ebllDescription, lead_Region, FUN=sum)
+#Rename grouped field
+colnames(lead_RegionGrpDenominator)[colnames(lead_RegionGrpDenominator) == 'denominator'] <- 'regionDenominator'
+
+lead_RegionWithTestGrp <- merge(x= lead_Region, 
+                                y= lead_RegionGrpTested, 
+                                by= c("ageGroup", "Region", "year", "indicator", "indicator.type", "ebllDescription"), 
+                                all.x = TRUE) #Left join so counties may be displayed moving forward
+lead_RegionComplete <- merge(x= lead_RegionWithTestGrp, 
+                             y= lead_RegionGrpDenominator, 
+                             by= c("ageGroup", "Region", "year", "indicator", "indicator.type", "ebllDescription"), 
+                             all.x = TRUE) #Left join so counties may be displayed moving forward
+lead_RegionComplete$regionTestPct <- round(lead_RegionComplete$regionNumTested/lead_RegionComplete$regionDenominator*100,2)
 
 # Combine CHB
 # This does not appear to be correct when including the all = TRUE. It seems like it is executing an outer join not an inner join
@@ -331,53 +349,33 @@ lead_CHB <- merge(x= df_leadRaw, y= df_chbRaw, by.x= "location", by.y= "County")
 #Combine in a completed data set
 
 #Sum will be applied to numTested and it will (~) be subset by everything after
-lead_CHBGrpTested <-  aggregate(numTested~
-                                  ageGroup+
-                                  CHB+
-                                  year+
-                                  indicator+
-                                  indicator.type+
-                                  ebllDescription, lead_CHB, FUN=sum)
+lead_CHBGrpTested <-  aggregate(numTested~ ageGroup+ CHB+ year+ indicator+ indicator.type+ ebllDescription, lead_CHB, FUN=sum)
 #Rename grouped field
-colnames(lead_CHBGrpTested)[colnames(lead_CHBGrpTested) == 
-                              'numTested'] <- 'chbNumTested'
+colnames(lead_CHBGrpTested)[colnames(lead_CHBGrpTested) == 'numTested'] <- 'chbNumTested'
 
-lead_CHBGrpDenominator <-  aggregate(denominator~
-                                       ageGroup+
-                                       CHB+
-                                       year+
-                                       indicator+
-                                       indicator.type+
-                                       ebllDescription, lead_CHB, FUN=sum)
+lead_CHBGrpDenominator <-  aggregate(denominator~ ageGroup+ CHB+ year+ indicator+ indicator.type+ ebllDescription, lead_CHB, FUN=sum)
 #Rename grouped field
-colnames(lead_CHBGrpDenominator)[colnames(lead_CHBGrpDenominator) == 
-                                   'denominator'] <- 'chbDenominator'
+colnames(lead_CHBGrpDenominator)[colnames(lead_CHBGrpDenominator) == 'denominator'] <- 'chbDenominator'
 
 lead_CHBWithTestGrp <- merge(x= lead_CHB, 
                              y= lead_CHBGrpTested, 
-                             by= c(
-                               "ageGroup",
-                               "CHB",
-                               "year",
-                               "indicator",
-                               "indicator.type",
-                               "ebllDescription"), 
+                             by= c("ageGroup", "CHB", "year", "indicator", "indicator.type", "ebllDescription"), 
                              all.x = TRUE) #Left join so counties may be displayed moving forward
+
 lead_CHBComplete <- merge(x= lead_CHBWithTestGrp, 
                           y= lead_CHBGrpDenominator, 
-                          by= c(
-                            "ageGroup",
-                            "CHB",
-                            "year",
-                            "indicator",
-                            "indicator.type",
-                            "ebllDescription"), 
+                          by= c("ageGroup", "CHB", "year", "indicator", "indicator.type", "ebllDescription"), 
                           all.x = TRUE) #Left join so counties may be displayed moving forward
+
 lead_CHBComplete$CHBTestPct <- round(lead_CHBComplete$chbNumTested/lead_CHBComplete$chbDenominator*100,2)
-# #  
+
+
 
 server <- function(input, output, session) {
   
+
+# Region & County ---------------------------------------------------------
+
   output$region_narrative <- renderUI({
     # Replace the values that are equal to input county by adding the font tag
     schsac_raw$County[schsac_raw$County == input$parGlobal_county] <-  paste("<font color=red>", schsac_raw$County[schsac_raw$County == input$parGlobal_county], "</font>")
@@ -524,8 +522,10 @@ server <- function(input, output, session) {
   observe({
     if(input$smID %in% c("tn_homePage","tn_regionChbDefinations")) # it requires an ID of sidebarMenu (in this case)
     { 
-      shinyjs::disable("parGlobal_region")
-      shinyjs::disable("parGlobal_chb")
+      # shinyjs::disable("parGlobal_region")
+      # shinyjs::disable("parGlobal_chb")
+      shinyjs::hide("parGlobal_region")
+      shinyjs::hide("parGlobal_chb")
     } 
     else 
     {
@@ -592,60 +592,7 @@ server <- function(input, output, session) {
       )
   })
   
-  #Region
-  # Combine Region
-  # A lot of sources online say to use all= TRUE after the by condition for an inner. 
-  # This does not appear to be correct. It seems like it is executing an outer join not an inner join
-  lead_Region <- merge(x= df_leadRaw, y= df_schsacRaw, by.x= "location", by.y= "County") #, all = TRUE) Don't include the all = TRUE 
-  # #https://www.youtube.com/watch?v=zmiC7X9fUmo
-  # First sum number tested
-  # Next sum denominator
-  #Combine in a completed data set
   
-  #Sum will be applied to numTested and it will (~) be subsetted by everything after
-  lead_RegionGrpTested <-  aggregate(numTested~
-                                       ageGroup+
-                                       Region+
-                                       year+
-                                       indicator+
-                                       indicator.type+
-                                       ebllDescription, lead_Region, FUN=sum)
-  #Rename grouped field
-  colnames(lead_RegionGrpTested)[colnames(lead_RegionGrpTested) == 
-                                   'numTested'] <- 'regionNumTested'
-  
-  lead_RegionGrpDenominator <-  aggregate(denominator~
-                                            ageGroup+
-                                            Region+
-                                            year+
-                                            indicator+
-                                            indicator.type+
-                                            ebllDescription, lead_Region, FUN=sum)
-  #Rename grouped field
-  colnames(lead_RegionGrpDenominator)[colnames(lead_RegionGrpDenominator) == 
-                                        'denominator'] <- 'regionDenominator'
-  
-  lead_RegionWithTestGrp <- merge(x= lead_Region, 
-                                  y= lead_RegionGrpTested, 
-                                  by= c(
-                                    "ageGroup",
-                                    "Region",
-                                    "year",
-                                    "indicator",
-                                    "indicator.type",
-                                    "ebllDescription"), 
-                                  all.x = TRUE) #Left join so counties may be displayed moving forward
-  lead_RegionComplete <- merge(x= lead_RegionWithTestGrp, 
-                               y= lead_RegionGrpDenominator, 
-                               by= c(
-                                 "ageGroup",
-                                 "Region",
-                                 "year",
-                                 "indicator",
-                                 "indicator.type",
-                                 "ebllDescription"), 
-                               all.x = TRUE) #Left join so counties may be displayed moving forward
-  lead_RegionComplete$regionTestPct <- round(lead_RegionComplete$regionNumTested/lead_RegionComplete$regionDenominator*100,2)
   # #  
   #Reactive Data
   lead_region_sub <- reactive({lead_RegionComplete[input$parGlobal_region == lead_RegionComplete$Region & #Changed variable so no longer need to use gsub
@@ -682,7 +629,7 @@ server <- function(input, output, session) {
   validateChb <- reactive({
     validate(
       need(
-        input$parGlobal_chb == lead_CHBComplete$CHB, paste("There is no data for ", input$parGlobal_chb)
+        input$parGlobal_chb %in% lead_CHBComplete$CHB, paste("There is no data for ", input$parGlobal_chb)
       )
     )
   })
@@ -746,6 +693,7 @@ server <- function(input, output, session) {
   output$lead_county <-  renderPlot({
     #Open parenthesis since it is dynamic
     lead_county_sub() |>
+  
       ggplot(aes(x= year, y= pctTested, color= ageGroup)) +
       geom_line()+
       geom_point()+
