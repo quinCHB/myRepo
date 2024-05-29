@@ -78,7 +78,7 @@ export type FSType = 'NODEFS' | 'WORKERFS';
 /**
  * Configuration settings to be used when mounting Filesystem objects with
  * Emscripten
- */
+ * */
 export type FSMountOptions<T extends FSType = FSType> = T extends 'NODEFS' ? {
     root: string;
 } : {
@@ -180,7 +180,7 @@ export declare class WebR {
     constructor(options?: WebROptions);
     /**
      * @returns {Promise<void>} A promise that resolves once webR has been
-     * initialised.
+     * intialised.
      */
     init(): Promise<unknown>;
     /**
@@ -227,7 +227,7 @@ export declare class WebR {
     /**
      * Evaluate the given R code.
      *
-     * Stream outputs and any conditions raised during execution are written to
+     * Stream outputs and any conditions raised during exectution are written to
      * the JavaScript console.
      * @param {string} code The R code to evaluate.
      * @param {EvalROptions} [options] Options for the execution environment.
@@ -290,7 +290,7 @@ export declare class Shelter {
     /**
      * Evaluate the given R code.
      *
-     * Stream outputs and any conditions raised during execution are written to
+     * Stream outputs and any conditions raised during exectution are written to
      * the JavaScript console. The returned R object is protected by the shelter.
      * @param {string} code The R code to evaluate.
      * @param {EvalROptions} [options] Options for the execution environment.
@@ -300,24 +300,16 @@ export declare class Shelter {
     /**
      * Evaluate the given R code, capturing output.
      *
-     * Stream outputs and conditions raised during execution are captured and
+     * Stream outputs and conditions raised during exectution are captured and
      * returned as part of the output of this function. Returned R objects are
      * protected by the shelter.
      * @param {string} code The R code to evaluate.
      * @param {EvalROptions} [options] Options for the execution environment.
-     * @returns {Promise<{
-     *   result: RObject,
-     *   output: { type: string; data: any }[],
-     *   images: ImageBitmap[]
-     * }>} An object containing the result of the computation, an array of output,
-     *   and an array of captured plots.
+     * @returns {Promise<{result: RObject, output: unknown[]}>} An object
+     * containing the result of the computation and and array of captured output.
      */
     captureR(code: string, options?: EvalROptions): Promise<{
         result: RObject;
-        output: {
-            type: string;
-            data: any;
-        }[];
-        images: ImageBitmap[];
+        output: unknown[];
     }>;
 }

@@ -4,18 +4,26 @@
 
 
 # install.packages("pak")
-pak::pak("posit-dev/r-shinylive")
-#pak::pak("rstudio/httpuv")
-library(httpuv)
+#pak::pak("posit-dev/r-shinylive") #Dev shinyLive seemed to not work 0.3.0. (0.2.3 does work 4/23/24)
+pak::pak("rstudio/httpuv") # dev httpuv worked with CRAN shinylive 
+#library(httpuv)
+library(shinylive)
+#library(httpuv)
 
-remove.packages(rstudio/httpuv)
+#pak::pkg_remove("shinylive")
+#pak::pkg_remove("httpuv")
+#install.packages("shinylive")
+#install.packages("httpuv")
+
+#shinylive::assets_version()
 
 # Version for the packages
 # Uncomment the next two lines to see versions
-# packageVersion("shinylive")
-# packageVersion("httpuv")
+ # packageVersion("shinylive")
+ # packageVersion("httpuv")
+ 
 
-shinylive::export(appdir = "Default Application", destdir = "docs")
+shinylive::export(appdir = "app", destdir = "docs")
 
 
 # Thank you Ellis Hughes and Patrick Ward for your tutorial

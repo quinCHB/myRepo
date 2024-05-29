@@ -1569,13 +1569,11 @@ if (globalThis.document) {
 // webR/utils.ts
 function promiseHandles() {
   const out = {
-    resolve: () => {
-      return;
+    resolve: (_value) => {
     },
-    reject: () => {
-      return;
+    reject: (_reason) => {
     },
-    promise: Promise.resolve()
+    promise: null
   };
   const promise = new Promise((resolve, reject) => {
     out.resolve = resolve;
@@ -1590,7 +1588,7 @@ var import_msgpack = __toESM(require_dist());
 var requests = {};
 function handleInstall() {
   console.log("webR service worker installed");
-  void self.skipWaiting();
+  self.skipWaiting();
 }
 function handleActivate(event) {
   console.log("webR service worker activating");
@@ -1615,18 +1613,18 @@ function handleFetch(event) {
     return false;
   }
   const requestBody = event.request.arrayBuffer();
-  const requestResponse = requestBody.then(async (body) => {
+  const requestReponse = requestBody.then(async (body) => {
     const data = (0, import_msgpack.decode)(body);
     return await sendRequest(data.clientId, data.uuid);
   });
-  event.waitUntil(requestResponse);
-  event.respondWith(requestResponse);
+  event.waitUntil(requestReponse);
+  event.respondWith(requestReponse);
   return true;
 }
 function handleMessage(event) {
   switch (event.data.type) {
     case "register-client-main": {
-      void self.clients.claim();
+      self.clients.claim();
       const source = event.source;
       self.clients.get(source.id).then((client) => {
         if (!client) {
@@ -1636,9 +1634,6 @@ function handleMessage(event) {
           type: "registration-successful",
           clientId: source.id
         });
-      }, (reason) => {
-        console.log(reason);
-        throw new WebRChannelError("Can't respond to client in service worker message handler");
       });
       break;
     }

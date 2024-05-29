@@ -1992,13 +1992,11 @@ if (globalThis.document) {
 // webR/utils.ts
 function promiseHandles() {
   const out = {
-    resolve: () => {
-      return;
+    resolve: (_value) => {
     },
-    reject: () => {
-      return;
+    reject: (_reason) => {
     },
-    promise: Promise.resolve()
+    promise: null
   };
   const promise = new Promise((resolve, reject) => {
     out.resolve = resolve;
@@ -2011,11 +2009,8 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 function replaceInObject(obj, test, replacer, ...replacerArgs) {
-  if (obj === null || obj === void 0 || isImageBitmap(obj)) {
+  if (obj === null || typeof obj !== "object") {
     return obj;
-  }
-  if (obj instanceof ArrayBuffer) {
-    return new Uint8Array(obj);
   }
   if (test(obj)) {
     return replacer(obj, ...replacerArgs);
@@ -2025,12 +2020,9 @@ function replaceInObject(obj, test, replacer, ...replacerArgs) {
       (v) => replaceInObject(v, test, replacer, ...replacerArgs)
     );
   }
-  if (typeof obj === "object") {
-    return Object.fromEntries(
-      Object.entries(obj).map(([k, v]) => [k, replaceInObject(v, test, replacer, ...replacerArgs)])
-    );
-  }
-  return obj;
+  return Object.fromEntries(
+    Object.entries(obj).map(([k, v], i) => [k, replaceInObject(v, test, replacer, ...replacerArgs)])
+  );
 }
 function newCrossOriginWorker(url, cb) {
   const req = new XMLHttpRequest();
@@ -2050,9 +2042,6 @@ function isCrossOrigin(urlString) {
     return false;
   }
   return true;
-}
-function isImageBitmap(value) {
-  return typeof ImageBitmap !== "undefined" && value instanceof ImageBitmap;
 }
 function throwUnreachable(context) {
   let msg = "Reached the unreachable";
@@ -2249,7 +2238,7 @@ function webRPayloadAsError(payload) {
   return e;
 }
 function isWebRPayload(value) {
-  return !!value && typeof value === "object" && "payloadType" in value && "obj" in value;
+  return value && typeof value === "object" && "payloadType" in value && "obj" in value;
 }
 function isWebRPayloadPtr(value) {
   return isWebRPayload(value) && value.payloadType === "ptr";
@@ -2504,7 +2493,6 @@ var SharedBufferChannelMain = class extends ChannelMain {
     __privateAdd(this, _handleEventsFromWorker);
     __privateAdd(this, _interruptBuffer, void 0);
     this.close = () => {
-      return;
     };
     __privateAdd(this, _onMessageFromWorker, async (worker, message) => {
       if (!message || !message.type) {
@@ -2581,7 +2569,7 @@ _handleEventsFromWorker = new WeakSet();
 handleEventsFromWorker_fn = function(worker) {
   if (IN_NODE) {
     worker.on("message", (message) => {
-      void __privateGet(this, _onMessageFromWorker).call(this, worker, message);
+      __privateGet(this, _onMessageFromWorker).call(this, worker, message);
     });
   } else {
     worker.onmessage = (ev) => __privateGet(this, _onMessageFromWorker).call(this, worker, ev.data);
@@ -2595,10 +2583,8 @@ var SharedBufferChannelWorker = class {
     __privateAdd(this, _dispatch, () => 0);
     __privateAdd(this, _interruptBuffer2, new Int32Array(new SharedArrayBuffer(4)));
     __privateAdd(this, _interrupt, () => {
-      return;
     });
     this.onMessageFromMainThread = () => {
-      return;
     };
     __privateSet(this, _ep, IN_NODE ? require("worker_threads").parentPort : globalThis);
     setInterruptBuffer(__privateGet(this, _interruptBuffer2).buffer);
@@ -2661,12 +2647,11 @@ var ServiceWorkerChannelMain = class extends ChannelMain {
     __privateAdd(this, _onMessageFromServiceWorker);
     __privateAdd(this, _handleEventsFromWorker2);
     this.close = () => {
-      return;
     };
     __privateAdd(this, _syncMessageCache, /* @__PURE__ */ new Map());
     __privateAdd(this, _registration, void 0);
     __privateAdd(this, _interrupted, false);
-    __privateAdd(this, _onMessageFromWorker2, (worker, message) => {
+    __privateAdd(this, _onMessageFromWorker2, async (worker, message) => {
       if (!message || !message.type) {
         return;
       }
@@ -2700,7 +2685,7 @@ var ServiceWorkerChannelMain = class extends ChannelMain {
         worker.terminate();
         this.putClosedMessage();
       };
-      void __privateMethod(this, _registerServiceWorker, registerServiceWorker_fn).call(this, `${config.serviceWorkerUrl}webr-serviceworker.js`).then(
+      __privateMethod(this, _registerServiceWorker, registerServiceWorker_fn).call(this, `${config.serviceWorkerUrl}webr-serviceworker.js`).then(
         (clientId) => {
           const msg = {
             type: "init",
@@ -2746,7 +2731,7 @@ registerServiceWorker_fn = async function(url) {
   await navigator.serviceWorker.ready;
   window.addEventListener("beforeunload", () => {
     var _a;
-    void ((_a = __privateGet(this, _registration)) == null ? void 0 : _a.unregister());
+    (_a = __privateGet(this, _registration)) == null ? void 0 : _a.unregister();
   });
   const clientId = await new Promise((resolve) => {
     navigator.serviceWorker.addEventListener(
@@ -2761,7 +2746,7 @@ registerServiceWorker_fn = async function(url) {
     this.activeRegistration().postMessage({ type: "register-client-main" });
   });
   navigator.serviceWorker.addEventListener("message", (event) => {
-    void __privateMethod(this, _onMessageFromServiceWorker, onMessageFromServiceWorker_fn).call(this, event);
+    __privateMethod(this, _onMessageFromServiceWorker, onMessageFromServiceWorker_fn).call(this, event);
   });
   return clientId;
 };
@@ -2821,10 +2806,8 @@ var ServiceWorkerChannelWorker = class {
     __privateAdd(this, _lastInterruptReq, Date.now());
     __privateAdd(this, _dispatch2, () => 0);
     __privateAdd(this, _interrupt2, () => {
-      return;
     });
     this.onMessageFromMainThread = () => {
-      return;
     };
     if (!data.clientId || !data.location) {
       throw new WebRChannelError("Can't start service worker channel");
@@ -2918,7 +2901,6 @@ var PostMessageChannelMain = class extends ChannelMain {
     super();
     __privateAdd(this, _handleEventsFromWorker3);
     this.close = () => {
-      return;
     };
     __privateAdd(this, _worker, void 0);
     __privateAdd(this, _onMessageFromWorker3, async (worker, message) => {
@@ -2991,7 +2973,7 @@ _handleEventsFromWorker3 = new WeakSet();
 handleEventsFromWorker_fn3 = function(worker) {
   if (IN_NODE) {
     worker.on("message", (message) => {
-      void __privateGet(this, _onMessageFromWorker3).call(this, worker, message);
+      __privateGet(this, _onMessageFromWorker3).call(this, worker, message);
     });
   } else {
     worker.onmessage = (ev) => __privateGet(this, _onMessageFromWorker3).call(this, worker, ev.data);
@@ -3011,7 +2993,7 @@ var PostMessageChannelWorker = class {
      * fallback REPL to yield to the event loop with await.
      *
      * The drawback of this approach is that nested REPLs do not work, such as
-     * readline, browser or menu. Attempting to use a nested REPL prints an error
+     * realine, browser or menu. Attempting to use a nested REPL prints an error
      * to the JS console.
      *
      * R/Wasm errors during execution are caught and the REPL is restarted at the
@@ -3093,7 +3075,7 @@ var PostMessageChannelWorker = class {
     Module._setup_Rmainloop();
     Module._R_ReplDLLinit();
     Module._R_ReplDLLdo1();
-    void __privateGet(this, _asyncREPL).call(this);
+    __privateGet(this, _asyncREPL).call(this);
   }
   setDispatchHandler(dispatch2) {
     __privateSet(this, _dispatch3, dispatch2);
@@ -3105,11 +3087,9 @@ var PostMessageChannelWorker = class {
     this.write(req);
     return prom;
   }
-  setInterrupt() {
-    return;
+  setInterrupt(_) {
   }
   handleInterrupt() {
-    return;
   }
   onMessageFromMainThread(message) {
     const msg = message;
@@ -3145,7 +3125,7 @@ function newChannelWorker(msg) {
     case ChannelType.PostMessage:
       return new PostMessageChannelWorker();
     default:
-      throw new WebRChannelError("Unknown worker channel type received");
+      throw new WebRChannelError("Unknown worker channel type recieved");
   }
 }
 
@@ -3180,10 +3160,10 @@ var RTypeMap = {
   function: 99
 };
 function isWebRDataJs(value) {
-  return !!value && typeof value === "object" && Object.keys(RTypeMap).includes(value.type);
+  return value && typeof value === "object" && Object.keys(RTypeMap).includes(value.type);
 }
 function isComplex(value) {
-  return !!value && typeof value === "object" && "re" in value && "im" in value;
+  return value && typeof value === "object" && "re" in value && "im" in value;
 }
 
 // webR/utils-r.ts
@@ -3313,41 +3293,13 @@ function newObjectFromData(obj) {
   if (isComplex(obj)) {
     return new RComplex(obj);
   }
-  if (ArrayBuffer.isView(obj) || obj instanceof ArrayBuffer) {
-    return new RRaw(obj);
-  }
   if (Array.isArray(obj)) {
     return newObjectFromArray(obj);
-  }
-  if (typeof obj === "object") {
-    return RList.fromObject(obj);
   }
   throw new Error("Robj construction for this JS object is not yet supported");
 }
 function newObjectFromArray(arr) {
   const prot = { n: 0 };
-  const hasObjects = arr.every((v) => v && typeof v === "object" && !isRObject(v) && !isComplex(v));
-  if (hasObjects) {
-    const _arr = arr;
-    const isConsistent = _arr.every((a) => {
-      return Object.keys(a).filter((k) => !Object.keys(_arr[0]).includes(k)).length === 0 && Object.keys(_arr[0]).filter((k) => !Object.keys(a).includes(k)).length === 0;
-    });
-    const isAtomic = _arr.every((a) => Object.values(a).every((v) => {
-      return isAtomicType(v) || isRVectorAtomic(v);
-    }));
-    if (isConsistent && isAtomic) {
-      return RList.fromD3(_arr);
-    }
-  }
-  if (arr.every((v) => typeof v === "boolean" || v === null)) {
-    return new RLogical(arr);
-  }
-  if (arr.every((v) => typeof v === "number" || v === null)) {
-    return new RDouble(arr);
-  }
-  if (arr.every((v) => typeof v === "string" || v === null)) {
-    return new RCharacter(arr);
-  }
   try {
     const call = new RCall([new RSymbol("c"), ...arr]);
     protectInc(call, prot);
@@ -3398,15 +3350,6 @@ var _RObject = class extends RObjectBase {
   isNull() {
     return Module2._TYPEOF(this.ptr) === RTypeMap.null;
   }
-  isNa() {
-    try {
-      const result = parseEvalBare("is.na(x)", { x: this });
-      protect(result);
-      return result.toBoolean();
-    } finally {
-      unprotect(1);
-    }
-  }
   isUnbound() {
     return this.ptr === objs.unboundValue.ptr;
   }
@@ -3437,7 +3380,6 @@ var _RObject = class extends RObjectBase {
     const names = this.names();
     return names && names.includes(name);
   }
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   toJs(options = { depth: 0 }, depth = 1) {
     throw new Error("This R object cannot be converted to JS");
   }
@@ -3587,10 +3529,10 @@ var RPairlist = class extends RObject {
   toObject({
     allowDuplicateKey = true,
     allowEmptyKey = false,
-    depth = -1
+    depth = 1
   } = {}) {
     const entries = this.entries({ depth });
-    const keys = entries.map(([k]) => k);
+    const keys = entries.map(([k, v]) => k);
     if (!allowDuplicateKey && new Set(keys).size !== keys.length) {
       throw new Error("Duplicate key when converting pairlist without allowDuplicateKey enabled");
     }
@@ -3673,37 +3615,14 @@ var RCall = class extends RObject {
     return RObject.wrap(Module2._CDR(this.ptr));
   }
   eval() {
-    return Module2.webr.evalR(this, { env: objs.baseEnv });
-  }
-  capture(options = {}) {
-    return Module2.webr.captureR(this, options);
-  }
-  deparse() {
-    const prot = { n: 0 };
-    try {
-      const call = Module2._Rf_lang2(
-        new RSymbol("deparse1").ptr,
-        Module2._Rf_lang2(new RSymbol("quote").ptr, this.ptr)
-      );
-      protectInc(call, prot);
-      const val = RCharacter.wrap(safeEval(call, objs.baseEnv));
-      protectInc(val, prot);
-      return val.toString();
-    } finally {
-      unprotect(prot.n);
-    }
+    return RObject.wrap(safeEval(this.ptr, objs.baseEnv));
   }
 };
 var RList = class extends RObject {
   constructor(val) {
-    var __super = (...args) => {
-      super(...args);
-    };
     if (val instanceof RObjectBase) {
       assertRType(val, "list");
-      __super(val);
-      const classes = RPairlist.wrap(Module2._ATTRIB(val.ptr)).get("class");
-      this.isDataFrame = !classes.isNull() && classes.toArray().includes("data.frame");
+      super(val);
       return this;
     }
     const prot = { n: 0 };
@@ -3715,11 +3634,10 @@ var RList = class extends RObject {
         Module2._SET_VECTOR_ELT(ptr, i, new RObject(v).ptr);
       });
       RObject.wrap(ptr).setNames(names);
-      __super(new RObjectBase(ptr));
+      super(new RObjectBase(ptr));
     } finally {
       unprotect(prot.n);
     }
-    this.isDataFrame = false;
   }
   get length() {
     return Module2._LENGTH(this.ptr);
@@ -3730,10 +3648,10 @@ var RList = class extends RObject {
   toObject({
     allowDuplicateKey = true,
     allowEmptyKey = false,
-    depth = -1
+    depth = 1
   } = {}) {
     const entries = this.entries({ depth });
-    const keys = entries.map(([k]) => k);
+    const keys = entries.map(([k, v]) => k);
     if (!allowDuplicateKey && new Set(keys).size !== keys.length) {
       throw new Error("Duplicate key when converting list without allowDuplicateKey enabled");
     }
@@ -3744,61 +3662,8 @@ var RList = class extends RObject {
       entries.filter((u, idx) => entries.findIndex((v) => v[0] === u[0]) === idx)
     );
   }
-  toD3() {
-    if (!this.isDataFrame) {
-      throw new Error(
-        "Can't convert R list object to D3 format. Object must be of class 'data.frame'."
-      );
-    }
-    const entries = this.entries();
-    return entries.reduce((a, entry) => {
-      entry[1].forEach((v, j) => a[j] = Object.assign(a[j] || {}, { [entry[0]]: v }));
-      return a;
-    }, []);
-  }
-  // JS objects are interpreted as R list objects. If we have a JS object with
-  // consistent columns of atomic type, make the returned R object a data.frame
-  static fromObject(obj) {
-    const { names, values } = toWebRData(obj);
-    const prot = { n: 0 };
-    try {
-      const hasNames = !!names && names.length > 0 && names.every((v) => v);
-      const hasArrays = values.length > 0 && values.every((v) => {
-        return Array.isArray(v) || ArrayBuffer.isView(v) || v instanceof ArrayBuffer;
-      });
-      if (hasNames && hasArrays) {
-        const _values = values;
-        const isConsistentLength = _values.every((a) => a.length === _values[0].length);
-        const isAtomic = _values.every((a) => {
-          return isAtomicType(a[0]) || isRVectorAtomic(a[0]);
-        });
-        if (isConsistentLength && isAtomic) {
-          const listObj = new RList({
-            type: "list",
-            names,
-            values: _values.map((a) => newObjectFromData(a))
-          });
-          protectInc(listObj, prot);
-          const asDataFrame = new RCall([new RSymbol("as.data.frame"), listObj]);
-          protectInc(asDataFrame, prot);
-          return asDataFrame.eval();
-        }
-      }
-    } finally {
-      unprotect(prot.n);
-    }
-    return new RList(obj);
-  }
-  static fromD3(arr) {
-    return this.fromObject(
-      Object.fromEntries(Object.keys(arr[0]).map((k) => [k, arr.map((v) => v[k])]))
-    );
-  }
-  entries(options = { depth: -1 }) {
+  entries(options = { depth: 1 }) {
     const obj = this.toJs(options);
-    if (this.isDataFrame && options.depth < 0) {
-      obj.values = obj.values.map((v) => v.toArray());
-    }
     return obj.values.map((v, i) => [obj.names ? obj.names[i] : null, v]);
   }
   toJs(options = { depth: 0 }, depth = 1) {
@@ -3822,16 +3687,6 @@ var RFunction = class extends RObject {
       const call = new RCall([this, ...args]);
       protectInc(call, prot);
       return call.eval();
-    } finally {
-      unprotect(prot.n);
-    }
-  }
-  capture(options = {}, ...args) {
-    const prot = { n: 0 };
-    try {
-      const call = new RCall([this, ...args]);
-      protectInc(call, prot);
-      return call.capture(options);
     } finally {
       unprotect(prot.n);
     }
@@ -3917,12 +3772,11 @@ var REnvironment = class extends RObject {
     }
     return this.getDollar(prop);
   }
-  toObject({ depth = -1 } = {}) {
+  toObject({ depth = 0 } = {}) {
     const symbols = this.names();
     return Object.fromEntries(
       [...Array(symbols.length).keys()].map((i) => {
-        const value = this.getDollar(symbols[i]);
-        return [symbols[i], depth < 0 ? value : value.toJs({ depth })];
+        return [symbols[i], this.getDollar(symbols[i]).toJs({ depth })];
       })
     );
   }
@@ -3970,7 +3824,7 @@ var RVectorAtomic = class extends RObject {
   subset(prop) {
     return super.subset(prop);
   }
-  getDollar() {
+  getDollar(prop) {
     throw new Error("$ operator is invalid for atomic vectors");
   }
   detectMissing() {
@@ -3992,7 +3846,7 @@ var RVectorAtomic = class extends RObject {
   }
   toObject({ allowDuplicateKey = true, allowEmptyKey = false } = {}) {
     const entries = this.entries();
-    const keys = entries.map(([k]) => k);
+    const keys = entries.map(([k, v]) => k);
     if (!allowDuplicateKey && new Set(keys).size !== keys.length) {
       throw new Error(
         "Duplicate key when converting atomic vector without allowDuplicateKey enabled"
@@ -4218,9 +4072,6 @@ __privateAdd(RCharacter, _newSetter5, (ptr) => {
 var _newSetter6;
 var _RRaw = class extends RVectorAtomic {
   constructor(val) {
-    if (val instanceof ArrayBuffer) {
-      val = new Uint8Array(val);
-    }
     super(val, "raw", __privateGet(_RRaw, _newSetter6));
   }
   getNumber(idx) {
@@ -4291,13 +4142,6 @@ function getRWorkerClass(type) {
 function isRObject(value) {
   return value instanceof RObject;
 }
-function isRVectorAtomic(value) {
-  const atomicRTypes = ["logical", "integer", "double", "complex", "character"];
-  return isRObject(value) && atomicRTypes.includes(value.type()) || isRObject(value) && value.isNa();
-}
-function isAtomicType(value) {
-  return value === null || typeof value === "number" || typeof value === "boolean" || typeof value === "string" || isComplex(value);
-}
 var objs;
 function initPersistentObjects() {
   objs = {
@@ -4337,8 +4181,7 @@ var onWorkerMessage = function(msg) {
   chan == null ? void 0 : chan.onMessageFromMainThread(msg);
 };
 if (IN_NODE) {
-  const workerThreads = require("worker_threads");
-  workerThreads.parentPort.on("message", onWorkerMessage);
+  require("worker_threads").parentPort.on("message", onWorkerMessage);
   globalThis.XMLHttpRequest = require_XMLHttpRequest().XMLHttpRequest;
 } else {
   globalThis.onmessage = (ev) => onWorkerMessage(ev.data);
@@ -4457,14 +4300,14 @@ function dispatch(msg) {
             const prot = { n: 0 };
             try {
               const capture = captureR(data.code, data.options);
-              protectInc(capture.result, prot);
-              protectInc(capture.output, prot);
-              const result = capture.result;
+              protectInc(capture, prot);
+              const result = capture.get("result");
+              const outputs = capture.get(2);
               keep(shelter, result);
-              const n = capture.output.length;
+              const n = outputs.length;
               const output = [];
               for (let i = 1; i < n + 1; ++i) {
-                const out = capture.output.get(i);
+                const out = outputs.get(i);
                 const type = out.pluck(1, 1).toString();
                 const data2 = out.get(2);
                 if (type === "stdout" || type === "stderr") {
@@ -4495,8 +4338,7 @@ function dispatch(msg) {
                 payloadType: "raw",
                 obj: {
                   result: resultPayload,
-                  output,
-                  images: capture.images
+                  output
                 }
               });
             } finally {
@@ -4781,9 +4623,8 @@ function mountImageUrl(url, mountpoint) {
   );
 }
 function mountImagePath(path, mountpoint) {
-  const fs = require("fs");
-  const buf = fs.readFileSync(path);
-  const metadata = JSON.parse(fs.readFileSync(
+  const buf = require("fs").readFileSync(path);
+  const metadata = JSON.parse(require("fs").readFileSync(
     path.replace(new RegExp(".data$"), ".js.metadata"),
     "utf8"
   ));
@@ -4836,7 +4677,7 @@ function callRObjectMethod(obj, prop, args) {
   });
   return { obj: ret, payloadType: "raw" };
 }
-function captureR(expr, options = {}) {
+function captureR(code, options = {}) {
   var _a;
   const prot = { n: 0 };
   try {
@@ -4845,7 +4686,6 @@ function captureR(expr, options = {}) {
         env: objs.globalEnv,
         captureStreams: true,
         captureConditions: true,
-        captureGraphics: typeof OffscreenCanvas !== "undefined",
         withAutoprint: false,
         throwJsException: true,
         withHandlers: true
@@ -4861,32 +4701,15 @@ function captureR(expr, options = {}) {
     if (envObj.type() !== "environment") {
       throw new Error("Attempted to evaluate R code with invalid environment object");
     }
-    const devEnvObj = new REnvironment({});
-    protectInc(devEnvObj, prot);
-    if (_options.captureGraphics) {
-      if (typeof OffscreenCanvas === "undefined") {
-        throw new Error(
-          "This environment does not have support for OffscreenCanvas. Consider disabling plot capture using `captureGraphics: false`."
-        );
-      }
-      parseEvalBare(`{
-        old_dev <- dev.cur()
-        webr::canvas(capture = TRUE)
-        new_dev <- dev.cur()
-        old_cache <- webr::canvas_cache()
-      }`, devEnvObj);
-    }
     const tPtr = objs.true.ptr;
     const fPtr = objs.false.ptr;
     const fn = parseEvalBare("webr::eval_r", objs.baseEnv);
-    const qu = parseEvalBare("quote", objs.baseEnv);
     protectInc(fn, prot);
-    protectInc(qu, prot);
-    const exprObj = new RObject(expr);
-    protectInc(exprObj, prot);
+    const codeObj = new RCharacter(code);
+    protectInc(codeObj, prot);
     const call = Module2._Rf_lang6(
       fn.ptr,
-      Module2._Rf_lang2(qu.ptr, exprObj.ptr),
+      codeObj.ptr,
       _options.captureConditions ? tPtr : fPtr,
       _options.captureStreams ? tPtr : fPtr,
       _options.withAutoprint ? tPtr : fPtr,
@@ -4901,49 +4724,24 @@ function captureR(expr, options = {}) {
         (out) => out.get("type").toString() === "error"
       );
       if (error) {
-        const call2 = error.pluck("data", "call");
-        const source = call2 && call2.type() === "call" ? call2.deparse() : "Unknown source";
-        const message = ((_a = error.pluck("data", "message")) == null ? void 0 : _a.toString()) || "An error occurred evaluating R code.";
-        throw new Error(`Error in ${source}: ${message}`);
+        throw new Error(
+          ((_a = error.pluck("data", "message")) == null ? void 0 : _a.toString()) || "An error occured evaluating R code."
+        );
       }
     }
-    let images = [];
-    if (_options.captureGraphics) {
-      const plots = parseEvalBare(`{
-        new_cache <- webr::canvas_cache()
-        plots <- setdiff(new_cache, old_cache)
-      }`, devEnvObj);
-      protectInc(plots, prot);
-      images = plots.toArray().map((idx) => {
-        return Module2.webr.canvas[idx].offscreen.transferToImageBitmap();
-      });
-      parseEvalBare(`{
-        dev.off(new_dev)
-        dev.set(old_dev)
-        webr::canvas_destroy(plots)
-      }`, devEnvObj);
-    }
-    return {
-      result: capture.get("result"),
-      output: capture.get("output"),
-      images
-    };
+    return capture;
   } finally {
     unprotect(prot.n);
   }
 }
-function evalR(expr, options = {}) {
+function evalR(code, options = {}) {
   var _a, _b;
-  options = Object.assign({
-    captureGraphics: false
-  }, options);
-  const prot = { n: 0 };
-  const capture = captureR(expr, options);
+  const capture = captureR(code, options);
+  Module2._Rf_protect(capture.ptr);
   try {
-    protectInc(capture.output, prot);
-    protectInc(capture.result, prot);
-    for (let i = 1; i <= capture.output.length; i++) {
-      const out = capture.output.get(i);
+    const output = capture.get("output");
+    for (let i = 1; i <= output.length; i++) {
+      const out = output.get(i);
       const outputType = out.get("type").toString();
       switch (outputType) {
         case "stdout":
@@ -4971,9 +4769,9 @@ ${((_b = out.pluck("data", "message")) == null ? void 0 : _b.toString()) || ""}`
           break;
       }
     }
-    return capture.result;
+    return capture.get("result");
   } finally {
-    unprotect(prot.n);
+    Module2._Rf_unprotect(1);
   }
 }
 function init(config) {
@@ -5009,9 +4807,6 @@ function init(config) {
   };
   Module2.webr = {
     UnwindProtectException,
-    evalR,
-    captureR,
-    canvas: {},
     resolveInit: () => {
       initPersistentObjects();
       chan == null ? void 0 : chan.setInterrupt(Module2._Rf_onintr);
@@ -5067,7 +4862,7 @@ function init(config) {
   globalThis.Module = Module2;
   setTimeout(() => {
     const scriptSrc = `${_config.baseUrl}R.bin.js`;
-    void loadScript(scriptSrc);
+    loadScript(scriptSrc);
   });
 }
 /*! Bundled license information:
