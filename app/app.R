@@ -87,6 +87,7 @@ ui <- dashboardPage(
                tabItem(
                  tabName = "tn_homePage", #tabName is what ties the menuItem to the tabItem
                  tabsetPanel(
+                   id="tpId_home",
                    tabPanel(
                      "Home Page",
                      fluidRow(
@@ -115,6 +116,7 @@ ui <- dashboardPage(
                tabItem(
                  tabName = "tn_regionChbDefinations",
                  tabsetPanel(
+                   id="tpId_RegionChb",
                    tabPanel(
                      "Region",
                      fluidRow(
@@ -521,42 +523,28 @@ server <- function(input, output, session) {
   
   # Observe what sidebar the user is on and only allow for read only access to global parameters
   observe({
-    if(input$smID %in% c("tn_homePage")) # it requires an ID of sidebarMenu (in this case)
-    {
-      shinyjs::hide("parGlobal_hideNarrative")
-      shinyjs::hide("parGlobal_county")
-      shinyjs::hide("parGlobal_region")
-      shinyjs::hide("parGlobal_chb")
-    }
+    if(input$smID == "tn_homePage") # it requires an ID of sidebarMenu
+      {
+        shinyjs::hide("parGlobal_hideNarrative")
+        shinyjs::hide("parGlobal_county")
+        shinyjs::hide("parGlobal_region")
+        shinyjs::hide("parGlobal_chb")
+      }
+    else if(input$smID == "tn_regionChbDefinations") # it requires an ID of sidebarMenu
+        {
+          shinyjs::hide("parGlobal_hideNarrative")
+          shinyjs::show("parGlobal_county")
+          shinyjs::hide("parGlobal_region")
+          shinyjs::hide("parGlobal_chb")
+        }
     else
-    {
-      shinyjs::show("parGlobal_hideNarrative")
-      shinyjs::show("parGlobal_county")
-      shinyjs::show("parGlobal_region")
-      shinyjs::show("parGlobal_chb")
-    }
+      {
+        shinyjs::show("parGlobal_hideNarrative")
+        shinyjs::show("parGlobal_county")
+        shinyjs::show("parGlobal_region")
+        shinyjs::show("parGlobal_chb")
+      }
   })
-  
-  
-  #Observe what sidebar the user is on and only allow for read only access to global parameters
-  observe({
-    if(input$smID %in% c("tn_regionChbDefinations")) # it requires an ID of sidebarMenu (in this case)
-    {
-      shinyjs::hide("parGlobal_hideNarrative")
-      shinyjs::hide("parGlobal_region")
-      shinyjs::hide("parGlobal_chb")
-    }
-    else
-    {
-      shinyjs::show("parGlobal_hideNarrative")
-      shinyjs::show("parGlobal_region")
-      shinyjs::show("parGlobal_chb")
-    }
-  })
-  
-  
-  
-  
   
   # # Observe the input value of the checkbox
   # observe({
