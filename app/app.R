@@ -539,20 +539,20 @@ server <- function(input, output, session) {
   
   
   # Observe what sidebar the user is on and only allow for read only access to global parameters
-  observe({
-    if(input$smID %in% c("tn_regionChbDefinations")) # it requires an ID of sidebarMenu (in this case)
-    {
-      shinyjs::hide("parGlobal_hideNarrative")
-      shinyjs::hide("parGlobal_region")
-      shinyjs::hide("parGlobal_chb")
-    }
-    else
-    {
-      shinyjs::show("parGlobal_hideNarrative")
-      shinyjs::show("parGlobal_region")
-      shinyjs::show("parGlobal_chb")
-    }
-  })
+  # observe({
+  #   if(input$smID %in% c("tn_regionChbDefinations")) # it requires an ID of sidebarMenu (in this case)
+  #   {
+  #     shinyjs::hide("parGlobal_hideNarrative")
+  #     shinyjs::hide("parGlobal_region")
+  #     shinyjs::hide("parGlobal_chb")
+  #   }
+  #   else
+  #   {
+  #     shinyjs::show("parGlobal_hideNarrative")
+  #     shinyjs::show("parGlobal_region")
+  #     shinyjs::show("parGlobal_chb")
+  #   }
+  # })
   
   
   
