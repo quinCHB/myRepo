@@ -546,25 +546,25 @@ server <- function(input, output, session) {
       }
   })
   
-  # # Observe the input value of the checkbox
-  # observe({
-  #   # Submenu --> tab name dependent on the parGlbal_hideNarrative
-  #   #This is done so it isn't doing it in the background when tab panels or submenus are changes
-  #   # Shiny may already do this but my thought process is since I don't know for sure that I should include it in the application until I learn more about shiny 4/9/2024
-  #   if(input$smID == "tn_healthyHomes" & input$tpId_healthyHomes == "Childhood Lead Exposure" & isTRUE(input$parGlobal_hideNarrative))
-  #   {
-  #     #Toggle does not seem to work. It works for one interation and then it doesn't function correcly with the checkbox which is why there are two if statements
-  #     shinyjs::hide("parLocal_leadYear") 
-  #     shinyjs::hide("par_leadStateRegionChb")
-  #     shinyjs::hide("cID_leadNarrative")
-  #   }
-  #   if(input$smID == "tn_healthyHomes" & input$tpId_healthyHomes == "Childhood Lead Exposure" & isFALSE(input$parGlobal_hideNarrative))
-  #   {
-  #     shinyjs::show("parLocal_leadYear")
-  #     shinyjs::show("par_leadStateRegionChb")
-  #     shinyjs::show("cID_leadNarrative")
-  #   }
-  # })
+  # Observe the input value of the checkbox
+  observe({
+    # Submenu --> tab name dependent on the parGlbal_hideNarrative
+    #This is done so it isn't doing it in the background when tab panels or submenus are changes
+    # Shiny may already do this but my thought process is since I don't know for sure that I should include it in the application until I learn more about shiny 4/9/2024
+    if(input$smID == "tn_healthyHomes" & input$tpId_healthyHomes == "Childhood Lead Exposure" & isTRUE(input$parGlobal_hideNarrative))
+    {
+      #Toggle does not seem to work. It works for one interation and then it doesn't function correcly with the checkbox which is why there are two if statements
+      shinyjs::hide("parLocal_leadYear")
+      shinyjs::hide("par_leadStateRegionChb")
+      shinyjs::hide("cID_leadNarrative")
+    }
+    if(input$smID == "tn_healthyHomes" & input$tpId_healthyHomes == "Childhood Lead Exposure" & isFALSE(input$parGlobal_hideNarrative))
+    {
+      shinyjs::show("parLocal_leadYear")
+      shinyjs::show("par_leadStateRegionChb")
+      shinyjs::show("cID_leadNarrative")
+    }
+  })
   
   #Healthy Homes
   
