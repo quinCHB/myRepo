@@ -95,14 +95,12 @@ ui <- dashboardPage(
                        column(
                          width = 12,
                          tags$h1("Welcome to the Landing Page for This Awesome Dashboard...Subjective of Course :)"),
-                         tags$h4("This shinyLive application is designed to replicate the work represeted ", 
+                         tags$h4("This shinyLive application is designed to reporduce the work represeted ", 
                                  tags$a(href="https://data.web.health.state.mn.us/web/mndata/", "here!", target= "_blank")
                          ),
-                         tags$h4("The features displayed on the top left are called parameters that require input from you"),
-                         tags$h4("The features displayed on the botton left are called sidebar menus."),
-                         tags$h4("Each sidebar menu will have at least one tab associated with it."),
-                         tags$h4("For example, this Home sidebar menu has the Home Page tab associated with it."),
-                         tags$h3("Currently, only two sidebar menus currently are working"),
+        
+                         tags$h4("The features displayed on the left are called sidebar menus."),
+                         tags$h3("Currently, only two sidebar menus are working"),
                          tags$h4("The Region & CHB Defintions sidebar menu has both tabs (Region and CHB) working"),
                          tags$h4("The Healthy Homes sidebar menu only has the Childhood Lead Exposure tab working"),
                          tags$h4("Limitations to the Childhood Lead Exposure data can be found ", 
