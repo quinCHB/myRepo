@@ -95,7 +95,7 @@ ui <- dashboardPage(
                        column(
                          width = 12,
                          tags$h1("Welcome to the Landing Page for This Awesome Dashboard...Subjective of Course :)"),
-                         tags$h4("This shinyLive application is designed to reporduce the work represeted ", 
+                         tags$h4("This shinyLive application is designed to minor the work represeted ", 
                                  tags$a(href="https://data.web.health.state.mn.us/web/mndata/", "here!", target= "_blank")
                          ),
         
